@@ -227,7 +227,7 @@
     @keyframes drip { 0%{top:-100%} 100%{top:200%} }
 
     /* ── TICKER (horizontal marquee) ── */
-    #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.05); border-bottom:1px solid rgba(255,255,255,.05); background:rgba(3,3,4,.78) !important; }
+    #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.04); background:rgba(3,3,4,.48) !important; }
     .ticker-track { display:flex; gap:0; white-space:nowrap; animation:tickerMove 35s linear infinite; }
     #ticker:hover .ticker-track { animation-play-state:paused; }
     @keyframes tickerMove { from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -348,15 +348,15 @@
     .dl-btn svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.6; }
     .dl-meta {
       margin-top:26px; font-size:10px; letter-spacing:.2em; color:rgba(255,255,255,.28);
-      padding:10px 24px; border:1px solid rgba(255,255,255,.08); border-radius:100px;
-      background:rgba(3,3,4,.70); backdrop-filter:blur(14px); display:inline-block;
+      padding:10px 24px; border:1px solid rgba(255,255,255,.07); border-radius:100px;
+      background:rgba(3,3,4,.46); backdrop-filter:blur(12px); display:inline-block;
     }
     .dl-pills { margin-top:28px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .dl-pill {
       font-size:9px; letter-spacing:.16em; text-transform:uppercase;
-      color:rgba(255,255,255,.32); padding:8px 18px;
-      border:1px solid rgba(255,255,255,.10); border-radius:100px;
-      background:rgba(3,3,4,.72); backdrop-filter:blur(14px);
+      color:rgba(255,255,255,.30); padding:8px 18px;
+      border:1px solid rgba(255,255,255,.08); border-radius:100px;
+      background:rgba(3,3,4,.48); backdrop-filter:blur(12px);
     }
 
     /* ── INSTALL GUIDE ── */
@@ -374,7 +374,7 @@
     @media (max-width:600px) { .install-grid{grid-template-columns:1fr;} #install{padding:0 24px 80px;} }
 
     /* ── FOOTER ── */
-    footer { padding:56px 48px 40px; border-top:1px solid rgba(255,255,255,.06); display:flex; flex-direction:column; align-items:center; gap:22px; background:rgba(3,3,4,.75) !important; }
+    footer { padding:56px 48px 40px; border-top:1px solid rgba(255,255,255,.04); display:flex; flex-direction:column; align-items:center; gap:22px; }
     .footer-logo { font-family:'Cinzel',serif; font-size:18px; letter-spacing:.42em; color:rgba(255,255,255,.22); }
     .footer-logo span { color:rgba(255,255,255,.09); }
     .footer-links { display:flex; gap:30px; list-style:none; flex-wrap:wrap; justify-content:center; }
@@ -385,7 +385,7 @@
       display:inline-flex; align-items:center; gap:7px;
       font-size:10px; letter-spacing:.14em; color:rgba(255,255,255,.38); text-decoration:none;
       padding:10px 22px; border:1px solid rgba(255,255,255,.10); border-radius:100px;
-      background:rgba(3,3,4,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      background:rgba(3,3,4,.48); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
       transition:color .35s, border-color .35s, transform .35s, background .35s;
     }
     .footer-contact svg { stroke:currentColor; fill:none; stroke-width:1.5; flex-shrink:0; }
