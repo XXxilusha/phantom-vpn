@@ -796,6 +796,137 @@
 
     /* crystal-section float — управляется через GSAP */
     #crystal-section { will-change:transform; }
+
+    /* ══════════════════════════════════════════════════════
+       MOBILE RESPONSIVE — полная адаптация под телефоны
+       ══════════════════════════════════════════════════════ */
+
+    /* ── Планшет 900px ── */
+    @media (max-width:900px) {
+      nav { padding:16px 24px; }
+      .nav-links { gap:20px; }
+      .nav-links a { padding:5px 10px; font-size:9px; }
+
+      #hero { min-height:100svh; }
+      .hero-title { font-size:clamp(60px,14vw,108px); }
+
+      #features { padding:80px 32px; }
+      #how { padding:80px 32px; }
+      #download { padding:100px 32px; }
+      #install { padding:0 32px 80px; }
+      #crystal-section { margin:30px 32px; padding:60px 40px; gap:52px; }
+    }
+
+    /* ── Мобильный 768px ── */
+    @media (max-width:768px) {
+      /* NAV */
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .nav-cta { padding:8px 18px; font-size:9px; letter-spacing:.14em; }
+
+      /* HERO */
+      #hero { height:100svh; min-height:580px; }
+      .hero-content { padding:0 20px; }
+      .hero-badge { font-size:8px; padding:7px 14px; margin-bottom:20px; letter-spacing:.2em; }
+      .hero-title { font-size:clamp(54px,16vw,92px); letter-spacing:.08em; }
+      .hero-vpn { font-size:clamp(16px,4vw,28px); letter-spacing:.4em; }
+      .hero-tagline { font-size:10px; letter-spacing:.22em; margin-bottom:36px; }
+      .hero-btns { flex-direction:column; align-items:center; gap:12px; }
+      .btn-primary, .btn-outline { width:100%; max-width:300px; text-align:center; justify-content:center; padding:14px 32px; }
+      .scroll-hint { bottom:24px; }
+
+      /* TICKER */
+      #ticker { padding:12px 0; }
+      .ticker-item { font-size:9px; padding:0 18px; }
+
+      /* STATS */
+      #stats { padding:36px 20px; }
+      .stats-grid { grid-template-columns:repeat(2,1fr); gap:28px; }
+      .stat-item { border-right:none; padding:0; }
+      .stat-num { font-size:34px; }
+
+      /* FEATURES */
+      #features { padding:60px 20px; max-width:100%; }
+      .sec-title { font-size:clamp(22px,6.5vw,38px); }
+      .features-grid { grid-template-columns:1fr; }
+      .feat-card { padding:28px 22px; }
+
+      /* HOW */
+      #how { padding:60px 20px; }
+      .how-inner { max-width:100%; }
+      .how-steps { grid-template-columns:1fr; gap:16px; margin-top:36px; }
+      .how-step { padding:28px 22px; }
+      .step-num { font-size:38px; margin-bottom:14px; }
+
+      /* CRYSTAL */
+      #crystal-section {
+        flex-direction:column; padding:40px 20px;
+        gap:32px; margin:16px 20px;
+        text-align:center;
+      }
+      #crystal-canvas { width:260px !important; height:260px !important; }
+      .crystal-text { max-width:100%; }
+      .crystal-quote { font-size:clamp(18px,5.5vw,28px); }
+
+      /* DOWNLOAD */
+      #download { padding:70px 20px; }
+      .dl-title { font-size:clamp(28px,8vw,50px); }
+      .dl-sub { font-size:10px; letter-spacing:.16em; }
+      .dl-btn { padding:15px 34px; font-size:11px; gap:10px; }
+      .dl-meta { font-size:9px; padding:8px 18px; }
+      .dl-pills { gap:8px; }
+      .dl-pill { font-size:8px; padding:7px 14px; }
+
+      /* INSTALL */
+      #install { padding:0 20px 60px; max-width:100%; }
+      .install-grid { grid-template-columns:1fr; }
+      .install-card { padding:26px 22px; }
+
+      /* FOOTER */
+      footer { padding:40px 20px 28px; gap:18px; }
+      .footer-logo { font-size:15px; letter-spacing:.3em; }
+      .footer-links { gap:14px; }
+      .footer-links a { font-size:8px; padding:5px 10px; }
+      .footer-contacts { flex-direction:column; align-items:center; gap:12px; width:100%; }
+      .footer-contact { width:100%; max-width:280px; justify-content:center; }
+      .footer-copy { font-size:8px; text-align:center; }
+
+      /* REDUCE sway amplitude on mobile */
+      @keyframes swayA { 0%,100%{transform:translateY(0) rotate(0deg)} 35%{transform:translateY(-5px) rotate(.5deg)} 70%{transform:translateY(-2px) rotate(-.3deg)} }
+      @keyframes swayB { 0%,100%{transform:translateY(0) rotate(0deg)} 45%{transform:translateY(-6px) rotate(-.6deg)} 80%{transform:translateY(-2px) rotate(.2deg)} }
+      @keyframes swayC { 0%,100%{transform:translate(0,0) rotate(0deg)} 30%{transform:translate(2px,-5px) rotate(.45deg)} 65%{transform:translate(-1px,-7px) rotate(-.35deg)} }
+      @keyframes swayD { 0%,100%{transform:translate(0,0) rotate(0deg)} 40%{transform:translate(-2px,-4px) rotate(-.5deg)} 75%{transform:translate(1px,-3px) rotate(.3deg)} }
+      @keyframes swayE { 0%,100%{transform:translateY(0) rotate(0deg)} 25%{transform:translateY(-7px) rotate(.6deg)} 60%{transform:translateY(-3px) rotate(-.4deg)} 85%{transform:translateY(-1px) rotate(.1deg)} }
+      @keyframes swayF { 0%,100%{transform:translate(0,0) rotate(0deg)} 20%{transform:translate(2px,-3px) rotate(.3deg)} 55%{transform:translate(-2px,-6px) rotate(-.5deg)} 80%{transform:translate(1px,-3px) rotate(.2deg)} }
+      @keyframes swayG { 0%,100%{transform:translate(0,0) rotate(0deg)} 50%{transform:translate(-2px,-7px) rotate(-.7deg)} }
+      @keyframes swayH { 0%,100%{transform:translate(0,0) rotate(0deg)} 33%{transform:translate(-1px,-4px) rotate(.45deg)} 66%{transform:translate(2px,-3px) rotate(-.35deg)} }
+    }
+
+    /* ── Маленький телефон 480px ── */
+    @media (max-width:480px) {
+      .hero-title { font-size:clamp(46px,14.5vw,78px); }
+      .hero-badge { display:none; }
+      .btn-primary, .btn-outline { max-width:260px; font-size:10px; padding:13px 28px; }
+
+      .stat-num { font-size:30px; }
+      .stat-suf { font-size:14px; }
+
+      #features { padding:48px 16px; }
+      #how { padding:48px 16px; }
+      #download { padding:60px 16px; }
+      #install { padding:0 16px 48px; }
+      footer { padding:32px 16px 24px; }
+
+      #crystal-section { margin:12px 16px; padding:32px 16px; }
+      #crystal-canvas { width:210px !important; height:210px !important; }
+
+      .how-step { padding:22px 18px; }
+      .feat-card { padding:24px 18px; }
+      .install-card { padding:22px 18px; }
+
+      .dl-btn { padding:14px 28px; width:100%; max-width:280px; justify-content:center; }
+      .dl-btn-wrap { width:100%; display:flex; justify-content:center; }
+    }
   </style>
 </head>
 <body>
