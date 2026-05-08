@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantom VPN вЂ” РЎРєРІРѕР·СЊ С‚СѓРјР°РЅ, РЅРµР·СЂРёРјС‹</title>
+  <title>Phantom VPN — Сквозь туман, незримы</title>
   <link rel="icon" href="../public/icon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -11,18 +11,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-  <!-- Р—РђРњР•РќР РЎРЎР«Р›РљРЈ: Р·Р°РіСЂСѓР·Рё exe РЅР° GitHub Releases Рё РІСЃС‚Р°РІСЊ РїСЂСЏРјСѓСЋ СЃСЃС‹Р»РєСѓ -->
-  <script>const DL_URL = "Р’РЎРўРђР’Р¬_РЎРЎР«Р›РљРЈ_РќРђ_EXE_Р—Р”Р•РЎР¬";</script>
+  <script>const DL_URL = "https://github.com/XXxilusha/phantom-vpn/releases/download/v2.0.0/Phantom.VPN.2.0.0.exe";</script>
 
   <style>
-    /* в”Ђв”Ђ RESET в”Ђв”Ђ */
+    /* ── RESET ── */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior: smooth; }
     body { font-family:'Inter',sans-serif; background:#030304; color:rgba(255,255,255,.55); overflow-x:hidden; }
     ::-webkit-scrollbar { width:3px; }
     ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.06); border-radius:2px; }
 
-    /* в”Ђв”Ђ NOISE (subtle grain texture) в”Ђв”Ђ */
+    /* ── NOISE (subtle grain texture) ── */
     body::before {
       content:''; position:fixed; inset:0; z-index:9999; pointer-events:none;
       opacity:.022;
@@ -30,7 +29,7 @@
       background-size:200px 200px;
     }
 
-    /* в”Ђв”Ђ LOADER в”Ђв”Ђ */
+    /* ── LOADER ── */
     #loader {
       position:fixed; inset:0; background:#030304; z-index:9998;
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px;
@@ -43,7 +42,7 @@
     .ld-fill { height:100%; width:0; background:rgba(255,255,255,.3); animation:ldFill 1.4s cubic-bezier(.4,0,.2,1) forwards; }
     @keyframes ldFill { to { width:100%; } }
 
-    /* в”Ђв”Ђ NAV в”Ђв”Ђ */
+    /* ── NAV ── */
     nav {
       position:fixed; top:0; left:0; right:0; z-index:1000;
       padding:22px 52px; display:flex; align-items:center; justify-content:space-between;
@@ -65,7 +64,7 @@
     .nav-cta:hover { border-color:rgba(255,255,255,.22); color:rgba(255,255,255,.7); transform:translateY(-1px); }
     @media (max-width:768px) { nav { padding:18px 24px; } .nav-links { display:none; } }
 
-    /* в”Ђв”Ђ HERO в”Ђв”Ђ */
+    /* ── HERO ── */
     #hero { position:relative; height:100vh; min-height:680px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
     .hero-bg { position:absolute; inset:0; z-index:0; background:url('./bg.jpg') center 30%/cover no-repeat; filter:brightness(.35) saturate(.22); }
     .hero-bg::before {
@@ -165,7 +164,7 @@
     .scroll-line::after { content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:rgba(255,255,255,.35); animation:drip 2s ease-in-out infinite; }
     @keyframes drip { to { top:100%; } }
 
-    /* в”Ђв”Ђ TICKER (horizontal marquee) в”Ђв”Ђ */
+    /* ── TICKER (horizontal marquee) ── */
     #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.03); }
     .ticker-track { display:flex; gap:0; white-space:nowrap; animation:tickerMove 35s linear infinite; }
     #ticker:hover .ticker-track { animation-play-state:paused; }
@@ -174,7 +173,7 @@
     .ticker-item:hover { color:rgba(255,255,255,.3); }
     .ticker-dot { color:rgba(255,255,255,.04); padding:0 4px; }
 
-    /* в”Ђв”Ђ STATS в”Ђв”Ђ */
+    /* ── STATS ── */
     #stats { padding:56px 48px; background:rgba(255,255,255,.008); }
     .stats-grid { max-width:860px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); }
     .stat-item { text-align:center; padding:0 20px; border-right:1px solid rgba(255,255,255,.04); }
@@ -184,7 +183,7 @@
     .stat-lbl { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.13); margin-top:8px; }
     @media (max-width:600px) { .stats-grid{grid-template-columns:repeat(2,1fr);gap:28px;} .stat-item{border-right:none;} #stats{padding:40px 24px;} }
 
-    /* в”Ђв”Ђ FEATURES в”Ђв”Ђ */
+    /* ── FEATURES ── */
     #features { padding:120px 48px; max-width:1200px; margin:0 auto; }
     .sec-tag { font-size:9px; letter-spacing:.42em; text-transform:uppercase; color:rgba(255,255,255,.12); margin-bottom:18px; }
     .sec-title { font-family:'Cinzel',serif; font-size:clamp(26px,4vw,46px); font-weight:500; letter-spacing:.04em; color:rgba(255,255,255,.52); margin-bottom:14px; line-height:1.25; overflow:hidden; }
@@ -215,7 +214,7 @@
     @media (max-width:900px) { .features-grid{grid-template-columns:repeat(2,1fr);} }
     @media (max-width:580px) { .features-grid{grid-template-columns:1fr;} #features{padding:80px 24px;} }
 
-    /* в”Ђв”Ђ HOW IT WORKS в”Ђв”Ђ */
+    /* ── HOW IT WORKS ── */
     #how { padding:120px 48px; background:rgba(255,255,255,.005); border-top:1px solid rgba(255,255,255,.03); }
     .how-inner { max-width:1000px; margin:0 auto; }
     .how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:52px; margin-top:68px; }
@@ -233,7 +232,7 @@
     .step-desc { font-size:12px; color:rgba(255,255,255,.17); line-height:1.85; }
     @media (max-width:700px) { .how-steps{grid-template-columns:1fr;} #how{padding:80px 24px;} .how-step::after{display:none;} }
 
-    /* в”Ђв”Ђ 3D CRYSTAL в”Ђв”Ђ */
+    /* ── 3D CRYSTAL ── */
     #crystal-section {
       padding:120px 48px; border-top:1px solid rgba(255,255,255,.03);
       display:flex; align-items:center; justify-content:center; gap:80px;
@@ -246,7 +245,7 @@
     .crystal-desc { font-size:12px; color:rgba(255,255,255,.17); line-height:1.95; }
     @media (max-width:860px) { #crystal-section{flex-direction:column;padding:80px 24px;gap:48px;text-align:center;} }
 
-    /* в”Ђв”Ђ DOWNLOAD в”Ђв”Ђ */
+    /* ── DOWNLOAD ── */
     #download { padding:150px 48px; text-align:center; position:relative; overflow:hidden; }
     .dl-bg { position:absolute; inset:0; background:url('./bg.jpg') center 60%/cover no-repeat; filter:brightness(.12) saturate(.14); z-index:0; }
     .dl-overlay {
@@ -285,7 +284,7 @@
     .dl-pills { margin-top:44px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .dl-pill { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.14); padding:8px 16px; border:1px solid rgba(255,255,255,.04); border-radius:100px; }
 
-    /* в”Ђв”Ђ INSTALL GUIDE в”Ђв”Ђ */
+    /* ── INSTALL GUIDE ── */
     #install { padding:0 48px 120px; max-width:860px; margin:0 auto; }
     .install-grid {
       display:grid; grid-template-columns:repeat(2,1fr);
@@ -299,7 +298,7 @@
     .install-desc { font-size:11px; color:rgba(255,255,255,.15); line-height:1.8; }
     @media (max-width:600px) { .install-grid{grid-template-columns:1fr;} #install{padding:0 24px 80px;} }
 
-    /* в”Ђв”Ђ FOOTER в”Ђв”Ђ */
+    /* ── FOOTER ── */
     footer { padding:56px 48px 40px; border-top:1px solid rgba(255,255,255,.03); display:flex; flex-direction:column; align-items:center; gap:22px; }
     .footer-logo { font-family:'Cinzel',serif; font-size:18px; letter-spacing:.42em; color:rgba(255,255,255,.22); }
     .footer-logo span { color:rgba(255,255,255,.09); }
@@ -322,11 +321,11 @@
 <nav id="nav">
   <a href="#" class="nav-logo">PHANTOM <span>VPN</span></a>
   <ul class="nav-links">
-    <li><a href="#features">Р¤СѓРЅРєС†РёРё</a></li>
-    <li><a href="#how">РљР°Рє СЂР°Р±РѕС‚Р°РµС‚</a></li>
-    <li><a href="#download">РЎРєР°С‡Р°С‚СЊ</a></li>
+    <li><a href="#features">Функции</a></li>
+    <li><a href="#how">Как работает</a></li>
+    <li><a href="#download">Скачать</a></li>
   </ul>
-  <a href="#download" class="nav-cta" id="nav-dl">РЎРєР°С‡Р°С‚СЊ Р±РµСЃРїР»Р°С‚РЅРѕ</a>
+  <a href="#download" class="nav-cta" id="nav-dl">Скачать бесплатно</a>
 </nav>
 
 <!-- Hero -->
@@ -336,32 +335,32 @@
   <canvas id="hero-canvas"></canvas>
 
   <div class="hero-content">
-    <div class="hero-badge" id="hero-badge">Р—Р°С‰РёС‰РµРЅРѕ СЃРµС‚СЊСЋ Cloudflare WARP</div>
+    <div class="hero-badge" id="hero-badge">Защищено сетью Cloudflare WARP</div>
     <h1 class="hero-title" id="hero-title">PHANTOM</h1>
     <span class="hero-vpn"  id="hero-vpn">VPN</span>
-    <p class="hero-tagline" id="hero-tagline">РЎРєРІРѕР·СЊ С‚СѓРјР°РЅ, РЅРµР·СЂРёРјС‹</p>
+    <p class="hero-tagline" id="hero-tagline">Сквозь туман, незримы</p>
     <div class="hero-btns"  id="hero-btns">
-      <a href="#download" class="btn-primary magnetic">РЎРєР°С‡Р°С‚СЊ Р±РµСЃРїР»Р°С‚РЅРѕ в†“</a>
-      <a href="#features"  class="btn-outline  magnetic">Рћ С„СѓРЅРєС†РёСЏС…</a>
+      <a href="#download" class="btn-primary magnetic">Скачать бесплатно ↓</a>
+      <a href="#features"  class="btn-outline  magnetic">О функциях</a>
     </div>
   </div>
 
   <!-- floating glassmorphism cards -->
   <div class="float-card fc-1">
     <div class="fc-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-    <div><div class="fc-label">РЁРёС„СЂРѕРІР°РЅРёРµ</div><div class="fc-value">РџРѕСЃС‚РєРІР°РЅС‚РѕРІРѕРµ</div></div>
+    <div><div class="fc-label">Шифрование</div><div class="fc-value">Постквантовое</div></div>
   </div>
   <div class="float-card fc-2">
     <div class="fc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-    <div><div class="fc-label">Р—Р°РґРµСЂР¶РєР°</div><div class="fc-value">&lt; 5 РјСЃ</div></div>
+    <div><div class="fc-label">Задержка</div><div class="fc-value">&lt; 5 мс</div></div>
   </div>
   <div class="float-card fc-3">
     <div class="fc-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-    <div><div class="fc-label">РџРѕР»РёС‚РёРєР°</div><div class="fc-value">РќСѓР»РµРІС‹Рµ Р»РѕРіРё</div></div>
+    <div><div class="fc-label">Политика</div><div class="fc-value">Нулевые логи</div></div>
   </div>
 
   <div class="scroll-hint">
-    <span>РЎРєСЂРѕР»Р»</span>
+    <span>Скролл</span>
     <div class="scroll-line"></div>
   </div>
 </section>
@@ -376,59 +375,59 @@
   <div class="stats-grid">
     <div class="stat-item">
       <div class="stat-num"><span class="ctr" data-to="50">0</span><span class="stat-suf">K+</span></div>
-      <div class="stat-lbl">Р—Р°С‰РёС‰С‘РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№</div>
+      <div class="stat-lbl">Защищённых пользователей</div>
     </div>
     <div class="stat-item">
       <div class="stat-num"><span class="ctr" data-to="190">0</span><span class="stat-suf">+</span></div>
-      <div class="stat-lbl">РЎС‚СЂР°РЅ</div>
+      <div class="stat-lbl">Стран</div>
     </div>
     <div class="stat-item">
       <div class="stat-num"><span class="ctr" data-to="99">0</span><span class="stat-suf">.9%</span></div>
-      <div class="stat-lbl">Р”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊ</div>
+      <div class="stat-lbl">Доступность</div>
     </div>
     <div class="stat-item">
       <div class="stat-num"><span class="ctr" data-to="0">0</span></div>
-      <div class="stat-lbl">РҐСЂР°РЅРёРјС‹С… Р»РѕРіРѕРІ</div>
+      <div class="stat-lbl">Хранимых логов</div>
     </div>
   </div>
 </section>
 
 <!-- Features -->
 <section id="features">
-  <div class="sec-tag">Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё</div>
-  <h2 class="sec-title">РЎРѕР·РґР°РЅ РґР»СЏ <em>РЅРµРІРёРґРёРјРѕСЃС‚Рё.</em><br>РћС‚С‚РѕС‡РµРЅ РґР»СЏ СЃРєРѕСЂРѕСЃС‚Рё.</h2>
-  <p class="sec-desc">РљР°Р¶РґР°СЏ С„СѓРЅРєС†РёСЏ вЂ” РґР»СЏ С‚РµС…, РєС‚Рѕ РЅРµ РёРґС‘С‚ РЅР° РєРѕРјРїСЂРѕРјРёСЃСЃ РјРµР¶РґСѓ РїСЂРёРІР°С‚РЅРѕСЃС‚СЊСЋ Рё РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊСЋ.</p>
+  <div class="sec-tag">Возможности</div>
+  <h2 class="sec-title">Создан для <em>невидимости.</em><br>Отточен для скорости.</h2>
+  <p class="sec-desc">Каждая функция — для тех, кто не идёт на компромисс между приватностью и производительностью.</p>
 
   <div class="features-grid">
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-      <div class="feat-name">РџРѕСЃС‚РєРІР°РЅС‚РѕРІРѕРµ С€РёС„СЂРѕРІР°РЅРёРµ</div>
-      <div class="feat-desc">Р—Р°С‰РёС‚Р° РѕС‚ Р±СѓРґСѓС‰РёС… РєРІР°РЅС‚РѕРІС‹С… РєРѕРјРїСЊСЋС‚РµСЂРѕРІ вЂ” Р°Р»РіРѕСЂРёС‚РјС‹, РѕРґРѕР±СЂРµРЅРЅС‹Рµ NIST, РєРѕС‚РѕСЂС‹Рµ РЅРµ РІР·Р»РѕРјР°С‚СЊ РЅРё РѕРґРЅРѕРјСѓ РёР·РІРµСЃС‚РЅРѕРјСѓ СѓСЃС‚СЂРѕР№СЃС‚РІСѓ.</div>
+      <div class="feat-name">Постквантовое шифрование</div>
+      <div class="feat-desc">Защита от будущих квантовых компьютеров — алгоритмы, одобренные NIST, которые не взломать ни одному известному устройству.</div>
     </div>
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>
       <div class="feat-name">Kill Switch</div>
-      <div class="feat-desc">РњРіРЅРѕРІРµРЅРЅРѕРµ РїРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ РїСЂРё РѕР±СЂС‹РІРµ VPN. Р’Р°С€ СЂРµР°Р»СЊРЅС‹Р№ IP РЅРµ СѓС‚РµС‡С‘С‚ РЅРё РЅР° РјРёР»Р»РёСЃРµРєСѓРЅРґСѓ.</div>
+      <div class="feat-desc">Мгновенное переподключение при обрыве VPN. Ваш реальный IP не утечёт ни на миллисекунду.</div>
     </div>
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <div class="feat-name">РќСѓР»РµРІС‹Рµ Р»РѕРіРё</div>
-      <div class="feat-desc">РњС‹ РЅРµ С…СЂР°РЅРёРј РЅРёС‡РµРіРѕ: РЅРё Р°РєС‚РёРІРЅРѕСЃС‚СЊ, РЅРё РІСЂРµРјСЏ РїРѕРґРєР»СЋС‡РµРЅРёР№, РЅРё IP-Р°РґСЂРµСЃР°. Р’Р°СЃ Р·РґРµСЃСЊ РЅРёРєРѕРіРґР° РЅРµ Р±С‹Р»Рѕ.</div>
+      <div class="feat-name">Нулевые логи</div>
+      <div class="feat-desc">Мы не храним ничего: ни активность, ни время подключений, ни IP-адреса. Вас здесь никогда не было.</div>
     </div>
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-      <div class="feat-name">РЎРµС‚СЊ Cloudflare WARP</div>
-      <div class="feat-desc">Р Р°Р±РѕС‚Р°РµС‚ РЅР° РѕРґРЅРѕР№ РёР· СЃР°РјС‹С… Р±С‹СЃС‚СЂС‹С… Рё РЅР°РґС‘Р¶РЅС‹С… РіР»РѕР±Р°Р»СЊРЅС‹С… СЃРµС‚РµР№ РІ РјРёСЂРµ. РњРµРЅСЊС€Рµ Р·Р°РґРµСЂР¶РєР° вЂ” Р±РѕР»СЊС€Рµ СЃРєРѕСЂРѕСЃС‚СЊ.</div>
+      <div class="feat-name">Сеть Cloudflare WARP</div>
+      <div class="feat-desc">Работает на одной из самых быстрых и надёжных глобальных сетей в мире. Меньше задержка — больше скорость.</div>
     </div>
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-      <div class="feat-name">Р—Р°РєСЂРµРїРёС‚СЊ СЃРµСЂРІРµСЂ</div>
-      <div class="feat-desc">Р—Р°С„РёРєСЃРёСЂСѓР№С‚Рµ С‚СѓРЅРЅРµР»СЊ РЅР° РєРѕРЅРєСЂРµС‚РЅРѕРј СЃРµСЂРІРµСЂРµ РґР»СЏ СЃС‚Р°Р±РёР»СЊРЅРѕРіРѕ РїРѕРІРµРґРµРЅРёСЏ Рё СЃС‚Р°С‚РёС‡РЅРѕРіРѕ IP. РћС‚Р»РёС‡РЅРѕ РґР»СЏ СЃС‚СЂРёРјРёРЅРіР° Рё СЂР°Р±РѕС‚С‹.</div>
+      <div class="feat-name">Закрепить сервер</div>
+      <div class="feat-desc">Зафиксируйте туннель на конкретном сервере для стабильного поведения и статичного IP. Отлично для стриминга и работы.</div>
     </div>
     <div class="feat-card tilt">
       <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
-      <div class="feat-name">РђРІС‚РѕРїРѕРґРєР»СЋС‡РµРЅРёРµ</div>
-      <div class="feat-desc">РџРѕРґРєР»СЋС‡Р°РµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРё Р·Р°РїСѓСЃРєРµ СЃРёСЃС‚РµРјС‹ вЂ” РІС‹ РїРѕРґ Р·Р°С‰РёС‚РѕР№ РµС‰С‘ РґРѕ РѕС‚РєСЂС‹С‚РёСЏ Р±СЂР°СѓР·РµСЂР° РёР»Рё Р»СЋР±РѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ.</div>
+      <div class="feat-name">Автоподключение</div>
+      <div class="feat-desc">Подключается автоматически при запуске системы — вы под защитой ещё до открытия браузера или любого приложения.</div>
     </div>
   </div>
 </section>
@@ -436,26 +435,26 @@
 <!-- How it works -->
 <section id="how">
   <div class="how-inner">
-    <div class="sec-tag">РџСЂРѕС†РµСЃСЃ</div>
-    <h2 class="sec-title">РќРµРІРёРґРёРјРѕСЃС‚СЊ Р·Р° <em>С‚СЂРё С€Р°РіР°.</em></h2>
+    <div class="sec-tag">Процесс</div>
+    <h2 class="sec-title">Невидимость за <em>три шага.</em></h2>
     <div class="how-steps">
       <div class="how-step">
         <div class="step-num">01</div>
         <div class="step-line"></div>
-        <div class="step-name">РЎРєР°С‡Р°Р№С‚Рµ Рё Р·Р°РїСѓСЃС‚РёС‚Рµ</div>
-        <div class="step-desc">РЎРєР°С‡Р°Р№С‚Рµ РїРѕСЂС‚Р°С‚РёРІРЅС‹Р№ .exe РґР»СЏ Windows. РќРёРєР°РєРѕР№ СѓСЃС‚Р°РЅРѕРІРєРё вЂ” РїСЂРёР»РѕР¶РµРЅРёРµ РЅР°СЃС‚СЂР°РёРІР°РµС‚ Cloudflare WARP Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРё РїРµСЂРІРѕРј Р·Р°РїСѓСЃРєРµ.</div>
+        <div class="step-name">Скачайте и запустите</div>
+        <div class="step-desc">Скачайте портативный .exe для Windows. Никакой установки — приложение настраивает Cloudflare WARP автоматически при первом запуске.</div>
       </div>
       <div class="how-step">
         <div class="step-num">02</div>
         <div class="step-line"></div>
-        <div class="step-name">РќР°Р¶РјРёС‚Рµ В«РџРѕРґРєР»СЋС‡РёС‚СЊВ»</div>
-        <div class="step-desc">РќР°Р¶РјРёС‚Рµ РєРЅРѕРїРєСѓ РїРёС‚Р°РЅРёСЏ. РЎРѕРµРґРёРЅРµРЅРёРµ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РјРµРЅРµРµ С‡РµРј Р·Р° 2 СЃРµРєСѓРЅРґС‹. РњРѕРЅРёС‚РѕСЂРёРЅРі РїРёРЅРіР°, СЃРєРѕСЂРѕСЃС‚Рё Рё РїРѕС‚РµСЂСЊ РїР°РєРµС‚РѕРІ вЂ” РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё.</div>
+        <div class="step-name">Нажмите «Подключить»</div>
+        <div class="step-desc">Нажмите кнопку питания. Соединение устанавливается менее чем за 2 секунды. Мониторинг пинга, скорости и потерь пакетов — в реальном времени.</div>
       </div>
       <div class="how-step">
         <div class="step-num">03</div>
         <div class="step-line"></div>
-        <div class="step-name">Р Р°Р±РѕС‚Р°Р№С‚Рµ РЅРµР·Р°РјРµС‚РЅРѕ</div>
-        <div class="step-desc">Р’РµСЃСЊ С‚СЂР°С„РёРє С€РёС„СЂСѓРµС‚СЃСЏ СЃРєРІРѕР·РЅС‹Рј РїРѕСЃС‚РєРІР°РЅС‚РѕРІС‹Рј WireGuard. РџСЂРѕРІР°Р№РґРµСЂ, СЂРµРєР»Р°РјРѕРґР°С‚РµР»Рё Рё СЃР»РµР¶РєР° вЂ” РЅРёС‡РµРіРѕ РЅРµ РІРёРґСЏС‚.</div>
+        <div class="step-name">Работайте незаметно</div>
+        <div class="step-desc">Весь трафик шифруется сквозным постквантовым WireGuard. Провайдер, рекламодатели и слежка — ничего не видят.</div>
       </div>
     </div>
   </div>
@@ -465,9 +464,9 @@
 <section id="crystal-section">
   <canvas id="crystal-canvas" width="360" height="360"></canvas>
   <div class="crystal-text">
-    <div class="sec-tag">Р¤РёР»РѕСЃРѕС„РёСЏ</div>
-    <h2 class="crystal-quote">РџСЂРёРІР°С‚РЅРѕСЃС‚СЊ вЂ” РЅРµ <em>С„СѓРЅРєС†РёСЏ.</em><br>Р­С‚Рѕ С„СѓРЅРґР°РјРµРЅС‚Р°Р»СЊРЅРѕРµ РїСЂР°РІРѕ.</h2>
-    <p class="crystal-desc">Phantom VPN СЃРѕР·РґР°РЅ РёР· РѕРґРЅРѕРіРѕ СѓР±РµР¶РґРµРЅРёСЏ: РІР°С€Р° С†РёС„СЂРѕРІР°СЏ РёРґРµРЅС‚РёС‡РЅРѕСЃС‚СЊ РїСЂРёРЅР°РґР»РµР¶РёС‚ С‚РѕР»СЊРєРѕ РІР°Рј. Р’ РјРёСЂРµ СЃР»РµР¶РєРё Рё РїСЂРѕРґР°Р¶Рё РґР°РЅРЅС‹С… РјС‹ РїРѕСЃС‚СЂРѕРёР»Рё РёРЅСЃС‚СЂСѓРјРµРЅС‚, РєРѕС‚РѕСЂС‹Р№ РЅРёС‡РµРіРѕ РЅРµ С‚СЂРµР±СѓРµС‚ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РІР°Рј РєРѕРЅС‚СЂРѕР»СЊ. РџРѕСЃС‚РєРІР°РЅС‚РѕРІР°СЏ РєСЂРёРїС‚РѕРіСЂР°С„РёСЏ, РёРЅС„СЂР°СЃС‚СЂСѓРєС‚СѓСЂР° Cloudflare, РёРЅС‚РµСЂС„РµР№СЃ РґР»СЏ СЏСЃРЅРѕСЃС‚Рё вЂ” РІРѕС‚ РєР°Рє РІС‹РіР»СЏРґРёС‚ РЅРµРІРёРґРёРјР°СЏ Р·Р°С‰РёС‚Р°.</p>
+    <div class="sec-tag">Философия</div>
+    <h2 class="crystal-quote">Приватность — не <em>функция.</em><br>Это фундаментальное право.</h2>
+    <p class="crystal-desc">Phantom VPN создан из одного убеждения: ваша цифровая идентичность принадлежит только вам. В мире слежки и продажи данных мы построили инструмент, который ничего не требует и возвращает вам контроль. Постквантовая криптография, инфраструктура Cloudflare, интерфейс для ясности — вот как выглядит невидимая защита.</p>
   </div>
 </section>
 
@@ -476,24 +475,24 @@
   <div class="dl-bg"></div>
   <div class="dl-overlay"></div>
   <div class="dl-inner">
-    <div class="sec-tag">Р”РѕСЃС‚СѓРїРЅРѕ СЃРµР№С‡Р°СЃ</div>
-    <h2 class="dl-title">РЎРєР°С‡Р°С‚СЊ<br>Phantom VPN</h2>
-    <p class="dl-sub">Р‘РµСЃРїР»Р°С‚РЅРѕ. Р‘РµР· Р°РєРєР°СѓРЅС‚Р°. Р‘РµР· РѕРіСЂР°РЅРёС‡РµРЅРёР№. Р‘РµР· Р»РѕРіРѕРІ.</p>
+    <div class="sec-tag">Доступно сейчас</div>
+    <h2 class="dl-title">Скачать<br>Phantom VPN</h2>
+    <p class="dl-sub">Бесплатно. Без аккаунта. Без ограничений. Без логов.</p>
 
     <div class="dl-btn-wrap">
       <a href="#" id="dl-link" class="dl-btn magnetic">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        РЎРєР°С‡Р°С‚СЊ РґР»СЏ Windows
+        Скачать для Windows
       </a>
     </div>
 
-    <div class="dl-meta">Р’РµСЂСЃРёСЏ 2.0.0 &nbsp;В·&nbsp; Windows 10 / 11 &nbsp;В·&nbsp; ~85 РњР‘ &nbsp;В·&nbsp; РџРѕСЂС‚Р°С‚РёРІРЅС‹Р№</div>
+    <div class="dl-meta">Версия 2.0.0 &nbsp;·&nbsp; Windows 10 / 11 &nbsp;·&nbsp; ~85 МБ &nbsp;·&nbsp; Портативный</div>
     <div class="dl-pills">
       <span class="dl-pill">Windows 10 / 11</span>
       <span class="dl-pill">64-bit</span>
-      <span class="dl-pill">Р‘РµР· СѓСЃС‚Р°РЅРѕРІРєРё</span>
-      <span class="dl-pill">WARP вЂ” Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё</span>
-      <span class="dl-pill">Р‘РµСЃРїР»Р°С‚РЅРѕ РЅР°РІСЃРµРіРґР°</span>
+      <span class="dl-pill">Без установки</span>
+      <span class="dl-pill">WARP — автоматически</span>
+      <span class="dl-pill">Бесплатно навсегда</span>
     </div>
   </div>
 </section>
@@ -502,24 +501,24 @@
 <section id="install">
   <div class="install-grid">
     <div class="install-card">
-      <div class="install-n">РЁР°Рі 01</div>
-      <div class="install-title">РЎРєР°С‡Р°Р№С‚Рµ Рё Р·Р°РїСѓСЃС‚РёС‚Рµ</div>
-      <div class="install-desc">РЎРєР°С‡Р°Р№С‚Рµ .exe С„Р°Р№Р» РІС‹С€Рµ. Р­С‚Рѕ РїРѕСЂС‚Р°С‚РёРІРЅС‹Р№ С„Р°Р№Р» вЂ” СѓСЃС‚Р°РЅРѕРІС‰РёРє РЅРµ РЅСѓР¶РµРЅ. РџСЂРѕСЃС‚Рѕ РґРІР°Р¶РґС‹ РєР»РёРєРЅРёС‚Рµ.</div>
+      <div class="install-n">Шаг 01</div>
+      <div class="install-title">Скачайте и запустите</div>
+      <div class="install-desc">Скачайте .exe файл выше. Это портативный файл — установщик не нужен. Просто дважды кликните.</div>
     </div>
     <div class="install-card">
-      <div class="install-n">РЁР°Рі 02</div>
-      <div class="install-title">Р Р°Р·СЂРµС€РёС‚Рµ СѓСЃС‚Р°РЅРѕРІРєСѓ WARP</div>
-      <div class="install-desc">РџСЂРё РїРµСЂРІРѕРј Р·Р°РїСѓСЃРєРµ Phantom Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё СЃРєР°С‡Р°РµС‚ Рё РЅР°СЃС‚СЂРѕРёС‚ Cloudflare WARP. Р Р°Р·СЂРµС€РёС‚Рµ Р·Р°РїСЂРѕСЃ UAC.</div>
+      <div class="install-n">Шаг 02</div>
+      <div class="install-title">Разрешите установку WARP</div>
+      <div class="install-desc">При первом запуске Phantom автоматически скачает и настроит Cloudflare WARP. Разрешите запрос UAC.</div>
     </div>
     <div class="install-card">
-      <div class="install-n">РЁР°Рі 03</div>
-      <div class="install-title">РџРѕРґРєР»СЋС‡РёС‚РµСЃСЊ Рё Р·Р°С‰РёС‚РёС‚РµСЃСЊ</div>
-      <div class="install-desc">РќР°Р¶РјРёС‚Рµ РєРЅРѕРїРєСѓ РїРёС‚Р°РЅРёСЏ РІ РїСЂРёР»РѕР¶РµРЅРёРё. IP РјРµРЅСЏРµС‚СЃСЏ РјРіРЅРѕРІРµРЅРЅРѕ, РІРµСЃСЊ С‚СЂР°С„РёРє С€РёС„СЂСѓРµС‚СЃСЏ Р·Р° СЃРµРєСѓРЅРґС‹.</div>
+      <div class="install-n">Шаг 03</div>
+      <div class="install-title">Подключитесь и защититесь</div>
+      <div class="install-desc">Нажмите кнопку питания в приложении. IP меняется мгновенно, весь трафик шифруется за секунды.</div>
     </div>
     <div class="install-card">
-      <div class="install-n">РЁР°Рі 04</div>
-      <div class="install-title">РќР°СЃС‚СЂРѕР№С‚Рµ РїРѕРґ СЃРµР±СЏ</div>
-      <div class="install-desc">Р’РєР»СЋС‡РёС‚Рµ Kill Switch, РїРѕСЃС‚РєРІР°РЅС‚РѕРІС‹Р№ СЂРµР¶РёРј, Р°РІС‚РѕРїРѕРґРєР»СЋС‡РµРЅРёРµ Рё Р·Р°РєСЂРµРїР»РµРЅРёРµ СЃРµСЂРІРµСЂР° РІ РЅР°СЃС‚СЂРѕР№РєР°С….</div>
+      <div class="install-n">Шаг 04</div>
+      <div class="install-title">Настройте под себя</div>
+      <div class="install-desc">Включите Kill Switch, постквантовый режим, автоподключение и закрепление сервера в настройках.</div>
     </div>
   </div>
 </section>
@@ -528,28 +527,28 @@
 <footer>
   <div class="footer-logo">PHANTOM <span>VPN</span></div>
   <ul class="footer-links">
-    <li><a href="#features">Р¤СѓРЅРєС†РёРё</a></li>
-    <li><a href="#how">РљР°Рє СЂР°Р±РѕС‚Р°РµС‚</a></li>
-    <li><a href="#download">РЎРєР°С‡Р°С‚СЊ</a></li>
-    <li><a href="#install">РЈСЃС‚Р°РЅРѕРІРєР°</a></li>
+    <li><a href="#features">Функции</a></li>
+    <li><a href="#how">Как работает</a></li>
+    <li><a href="#download">Скачать</a></li>
+    <li><a href="#install">Установка</a></li>
   </ul>
-  <p class="footer-copy">В© 2026 Phantom VPN &nbsp;В·&nbsp; РЎРєРІРѕР·СЊ С‚СѓРјР°РЅ, РЅРµР·СЂРёРјС‹</p>
+  <p class="footer-copy">© 2026 Phantom VPN &nbsp;·&nbsp; Сквозь туман, незримы</p>
 </footer>
 
 <script>
-/* в”Ђв”Ђ helpers в”Ђв”Ђ */
+/* ── helpers ── */
 if (typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 const qs  = s => document.querySelector(s);
 const qsa = s => document.querySelectorAll(s);
 
-/* в”Ђв”Ђ download link в”Ђв”Ђ */
+/* ── download link ── */
 const dlEl = document.getElementById('dl-link');
-if (typeof DL_URL !== 'undefined' && DL_URL && !DL_URL.includes('Р’РЎРўРђР’Р¬')) {
+if (typeof DL_URL !== 'undefined' && DL_URL && !DL_URL.includes('ВСТАВЬ')) {
   dlEl.href = DL_URL;
   dlEl.setAttribute('download', '');
 }
 
-/* в”Ђв”Ђ LOADER + hero entrance в”Ђв”Ђ */
+/* ── LOADER + hero entrance ── */
 window.addEventListener('load', () => {
   setTimeout(() => {
     qs('#loader').classList.add('out');
@@ -557,7 +556,7 @@ window.addEventListener('load', () => {
     /* text scramble on "PHANTOM" */
     const titleEl = qs('#hero-title');
     const FINAL   = 'PHANTOM';
-    const CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZв–‘в–’в–“в–€в–Ђв– в–Ў';
+    const CHARS   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ░▒▓█▀■□';
     let frame = 0, total = 40;
     const interval = setInterval(() => {
       titleEl.textContent = FINAL.split('').map((ch, i) => {
@@ -586,12 +585,12 @@ window.addEventListener('load', () => {
   }, 1500);
 });
 
-/* в”Ђв”Ђ NAV scroll в”Ђв”Ђ */
+/* ── NAV scroll ── */
 window.addEventListener('scroll', () => {
   qs('#nav').classList.toggle('scrolled', scrollY > 50);
 }, { passive:true });
 
-/* в”Ђв”Ђ HERO Three.js particles в”Ђв”Ђ */
+/* ── HERO Three.js particles ── */
 (function(){
   if (typeof THREE === 'undefined') return;
   const canvas = qs('#hero-canvas');
@@ -647,19 +646,19 @@ window.addEventListener('scroll', () => {
   window.addEventListener('resize', ()=>{ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); R.setSize(innerWidth,innerHeight); });
 })();
 
-/* в”Ђв”Ђ TICKER build в”Ђв”Ђ */
+/* ── TICKER build ── */
 (function(){
   const items = [
-    'РџРћРЎРўРљР’РђРќРўРћР’РћР•','KILL SWITCH','РќРЈР›Р•Р’Р«Р• Р›РћР“Р','CLOUDFLARE WARP',
-    'РђР’РўРћРџРћР”РљР›Р®Р§Р•РќРР•','256-BIT','WireGuard','Р—РђР©РРўРђ','ZERO LOGS',
-    'POST-QUANTUM','PRIVACY','РЁРР¤Р РћР’РђРќРР•','NO LOGS','PHANTOM'
+    'ПОСТКВАНТОВОЕ','KILL SWITCH','НУЛЕВЫЕ ЛОГИ','CLOUDFLARE WARP',
+    'АВТОПОДКЛЮЧЕНИЕ','256-BIT','WireGuard','ЗАЩИТА','ZERO LOGS',
+    'POST-QUANTUM','PRIVACY','ШИФРОВАНИЕ','NO LOGS','PHANTOM'
   ];
   const track = qs('#ticker-track');
-  const html = items.map(t => `<span class="ticker-item">${t}</span><span class="ticker-dot">В·</span>`).join('');
+  const html = items.map(t => `<span class="ticker-item">${t}</span><span class="ticker-dot">·</span>`).join('');
   track.innerHTML = html + html; /* duplicate for seamless loop */
 })();
 
-/* в”Ђв”Ђ CRYSTAL Three.js в”Ђв”Ђ */
+/* ── CRYSTAL Three.js ── */
 (function(){
   if (typeof THREE === 'undefined') return;
   const canvas = qs('#crystal-canvas');
@@ -704,7 +703,7 @@ window.addEventListener('scroll', () => {
   tickC();
 })();
 
-/* в”Ђв”Ђ STATS COUNTER в”Ђв”Ђ */
+/* ── STATS COUNTER ── */
 (function(){
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -729,7 +728,7 @@ window.addEventListener('scroll', () => {
   qsa('.ctr').forEach(el => obs.observe(el));
 })();
 
-/* в”Ђв”Ђ GSAP SCROLL ANIMATIONS в”Ђв”Ђ */
+/* ── GSAP SCROLL ANIMATIONS ── */
 (function(){
   if (typeof gsap === 'undefined') return;
 
@@ -770,7 +769,7 @@ window.addEventListener('scroll', () => {
   gsap.from('footer > *',{ opacity:0, y:16, stagger:.12, duration:.6, ease, scrollTrigger:{ trigger:'footer', start:'top 90%' }});
 })();
 
-/* в”Ђв”Ђ MAGNETIC BUTTONS в”Ђв”Ђ */
+/* ── MAGNETIC BUTTONS ── */
 (function(){
   if (typeof gsap === 'undefined') return;
   qsa('.magnetic').forEach(btn => {
@@ -804,7 +803,7 @@ window.addEventListener('scroll', () => {
   }
 })();
 
-/* в”Ђв”Ђ 3D CARD TILT в”Ђв”Ђ */
+/* ── 3D CARD TILT ── */
 qsa('.tilt').forEach(card => {
   card.addEventListener('mousemove', e => {
     const r=card.getBoundingClientRect();
@@ -820,5 +819,3 @@ qsa('.tilt').forEach(card => {
 </script>
 </body>
 </html>
-
-
