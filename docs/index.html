@@ -188,11 +188,12 @@
     .btn-primary:hover { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.25); color:rgba(255,255,255,.95); box-shadow:0 0 30px rgba(255,255,255,.06); }
     .btn-outline {
       font-size:11px; letter-spacing:.2em; text-transform:uppercase;
-      color:rgba(255,255,255,.22); text-decoration:none;
-      padding:15px 38px; border:1px solid rgba(255,255,255,.05); border-radius:100px;
+      color:rgba(255,255,255,.45); text-decoration:none;
+      padding:15px 38px; border:1px solid rgba(255,255,255,.12); border-radius:100px;
+      background:rgba(255,255,255,.04);
       transition:all .4s; display:inline-block;
     }
-    .btn-outline:hover { border-color:rgba(255,255,255,.14); color:rgba(255,255,255,.5); }
+    .btn-outline:hover { border-color:rgba(255,255,255,.25); color:rgba(255,255,255,.75); background:rgba(255,255,255,.08); }
 
     /* floating cards */
     .float-card {
@@ -280,14 +281,17 @@
     #how { padding:120px 48px; background:rgba(255,255,255,.005); border-top:1px solid rgba(255,255,255,.03); }
     .how-inner { max-width:1000px; margin:0 auto; }
     .how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:52px; margin-top:68px; }
-    .how-step { position:relative; }
-    /* connecting line between steps */
-    .how-step:not(:last-child)::after {
-      content:''; position:absolute;
-      top:26px; right:-26px;
-      width:52px; height:1px;
-      background:linear-gradient(to right, rgba(255,255,255,.06), transparent);
+    .how-step {
+      position:relative;
+      background:rgba(3,3,4,.42);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:36px 32px;
     }
+    /* connecting line between steps */
+    .how-step:not(:last-child)::after { display:none; }
     .step-num { font-family:'Cinzel',serif; font-size:52px; font-weight:600; color:rgba(255,255,255,.04); letter-spacing:.08em; margin-bottom:22px; }
     .step-line { width:26px; height:1px; background:rgba(255,255,255,.07); margin-bottom:22px; }
     .step-name { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.07em; color:rgba(255,255,255,.38); margin-bottom:13px; }
@@ -1193,10 +1197,10 @@ window.addEventListener('scroll', () => {
   const ease = 'power2.out';
 
   /* stats */
-  gsap.from('.stat-item',{ opacity:0, y:20, stagger:.1, duration:.7, ease, scrollTrigger:{ trigger:'#stats', start:'top 88%' }});
+  gsap.from('.stat-item',{ opacity:0, y:20, stagger:.1, duration:.7, ease, clearProps:'transform', scrollTrigger:{ trigger:'#stats', start:'top 88%' }});
 
   /* features */
-  gsap.from('.feat-card',{ opacity:0, y:30, stagger:.07, duration:.65, ease, scrollTrigger:{ trigger:'.features-grid', start:'top 82%' }});
+  gsap.from('.feat-card',{ opacity:0, y:30, stagger:.07, duration:.65, ease, clearProps:'transform', scrollTrigger:{ trigger:'.features-grid', start:'top 82%' }});
 
   /* section titles char reveal — keeps HTML tags + whitespace intact */
   qsa('.sec-title').forEach(el => {
@@ -1213,27 +1217,27 @@ window.addEventListener('scroll', () => {
   });
 
   /* how steps — stagger from left with delay */
-  gsap.from('.how-step',{ opacity:0, x:-28, stagger:.18, duration:.8, ease:'power3.out', scrollTrigger:{ trigger:'.how-steps', start:'top 82%' }});
+  gsap.from('.how-step',{ opacity:0, x:-28, stagger:.18, duration:.8, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'.how-steps', start:'top 82%' }});
 
   /* ticker fade-in */
   gsap.from('#ticker',{ opacity:0, duration:1.2, ease, scrollTrigger:{ trigger:'#ticker', start:'top 95%' }});
 
   /* crystal — spin entrance */
-  gsap.from('#crystal-canvas',{ opacity:0, scale:.8, rotation:-8, duration:1.3, ease:'power3.out', scrollTrigger:{ trigger:'#crystal-section', start:'top 80%' }});
-  gsap.from('.crystal-text > *',{ opacity:0, x:36, stagger:.14, duration:.95, ease:'power3.out', scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
+  gsap.from('#crystal-canvas',{ opacity:0, scale:.8, rotation:-8, duration:1.3, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#crystal-section', start:'top 80%' }});
+  gsap.from('.crystal-text > *',{ opacity:0, x:36, stagger:.14, duration:.95, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
 
   /* download */
   gsap.from('#download .sec-tag',  { opacity:0, y:16, duration:.6, ease, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
   gsap.from('#download .dl-title', { opacity:0, y:24, duration:.7, ease, delay:.12, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
   gsap.from('#download .dl-sub',   { opacity:0, y:16, duration:.6, ease, delay:.22, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
-  gsap.from('.dl-btn-wrap',        { opacity:0, scale:.92, duration:.8, ease:'back.out(1.3)', delay:.3, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
-  gsap.from('.dl-pills .dl-pill',  { opacity:0, y:10, stagger:.05, duration:.5, ease, delay:.4, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('.dl-btn-wrap',        { opacity:0, scale:.92, duration:.8, ease:'back.out(1.3)', delay:.3, clearProps:'transform', scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('.dl-pills .dl-pill',  { opacity:0, y:10, stagger:.05, duration:.5, ease, delay:.4, clearProps:'transform', scrollTrigger:{ trigger:'#download', start:'top 85%' }});
 
   /* install */
-  gsap.from('.install-card',{ opacity:0, y:22, stagger:.1, duration:.7, ease:'power3.out', scrollTrigger:{ trigger:'#install', start:'top 86%' }});
+  gsap.from('.install-card',{ opacity:0, y:22, stagger:.1, duration:.7, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#install', start:'top 86%' }});
 
   /* footer */
-  gsap.from('footer > *',{ opacity:0, y:18, stagger:.13, duration:.65, ease, scrollTrigger:{ trigger:'footer', start:'top 92%' }});
+  gsap.from('footer > *',{ opacity:0, y:18, stagger:.13, duration:.65, ease, clearProps:'transform', scrollTrigger:{ trigger:'footer', start:'top 92%' }});
 
   /* features sec-tag & sec-desc */
   gsap.from('#features .sec-tag, #features .sec-desc',{ opacity:0, y:14, stagger:.14, duration:.65, ease, scrollTrigger:{ trigger:'#features', start:'top 86%' }});
