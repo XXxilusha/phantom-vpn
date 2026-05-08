@@ -109,13 +109,13 @@
     @keyframes orbB { 0%{transform:translate(0,0)} 33%{transform:translate(-50vw,-30vh)} 66%{transform:translate(-20vw,-60vh)} 100%{transform:translate(0,0)} }
     @keyframes orbC { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(-15vw,20vh) scale(1.4)} 100%{transform:translate(0,0) scale(1)} }
 
-    /* Горизонтальная сканирующая линия */
+    /* Горизонтальная сканирующая линия — очень тихая */
     .scan-line {
       position:fixed; top:-2px; left:0; right:0; height:1px; z-index:3; pointer-events:none;
-      background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 30%, rgba(255,255,255,.35) 50%, rgba(255,255,255,.18) 70%, transparent 100%);
-      animation:scanDown 12s linear infinite;
+      background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 35%, rgba(255,255,255,.10) 50%, rgba(255,255,255,.05) 65%, transparent 100%);
+      animation:scanDown 22s linear infinite;
     }
-    @keyframes scanDown { 0%{top:-2px;opacity:.9} 80%{opacity:.9} 100%{top:100vh;opacity:0} }
+    @keyframes scanDown { 0%{top:-2px;opacity:.6} 70%{opacity:.6} 100%{top:100vh;opacity:0} }
 
     /* Мерцающие точки-звёзды */
     .star { position:fixed; border-radius:50%; pointer-events:none; z-index:2; background:white; }
@@ -822,7 +822,7 @@
       /* NAV */
       nav { padding:14px 20px; }
       .nav-links { display:none; }
-      .nav-cta { padding:8px 18px; font-size:9px; letter-spacing:.14em; }
+      .nav-cta { display:none; } /* hero уже содержит кнопку скачать */
 
       /* HERO */
       #hero { height:100svh; min-height:580px; }
@@ -873,6 +873,7 @@
       .dl-title { font-size:clamp(28px,8vw,50px); }
       .dl-sub { font-size:10px; letter-spacing:.16em; }
       .dl-btn { padding:15px 34px; font-size:11px; gap:10px; }
+      .dl-btn-wrap::before, .dl-btn-wrap::after { display:none; } /* убираем пульс-кольца — выглядят как лишние кнопки */
       .dl-meta { font-size:9px; padding:8px 18px; }
       .dl-pills { gap:8px; }
       .dl-pill { font-size:8px; padding:7px 14px; }
