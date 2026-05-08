@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #030304;
+  color: #c8c0d0;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* === Castle Background === */
+.bg-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/bg.jpg') center 30% / cover no-repeat;
+  filter: brightness(0.4) saturate(0.25);
+}
+
+.bg-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 45%, transparent 10%, rgba(3,3,4,0.6) 100%),
+    linear-gradient(to top, rgba(3,3,4,0.92) 0%, rgba(3,3,4,0.5) 35%, transparent 65%);
+}
+
+.bg-scene::after {
+  content: '';
+  position: absolute;
+  inset: -30px;
+  background:
+    radial-gradient(ellipse 80% 18% at 25% 62%, rgba(50,45,55,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 14% at 70% 52%, rgba(45,42,50,0.06) 0%, transparent 70%);
+  animation: fogDrift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+@keyframes fogDrift {
+  0%   { transform: translateX(0); opacity: 0.4; }
+  100% { transform: translateX(-25px); opacity: 0.8; }
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
+
+/* === Animations === */
+@keyframes flicker {
+  0%, 100% { opacity: 0.7; }
+  30% { opacity: 0.9; }
+  60% { opacity: 0.6; }
+}
+.flicker { animation: flicker 4s ease-in-out infinite; will-change: opacity; }
+
+/* === Speed Bars === */
+.bar-down {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.12));
+}
+.bar-up {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08));
+}
+
+.font-gothic { font-family: 'Cinzel', serif; }
+
+input:focus, button:focus { outline: none; }
+
+/* === Hide scrollbar for region selector === */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
