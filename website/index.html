@@ -292,7 +292,7 @@
     }
     /* connecting line between steps */
     .how-step:not(:last-child)::after { display:none; }
-    .step-num { font-family:'Cinzel',serif; font-size:52px; font-weight:600; color:rgba(255,255,255,.22); letter-spacing:.08em; margin-bottom:22px; }
+    .step-num { font-family:'Cinzel',serif; font-size:52px; font-weight:600; color:rgba(255,255,255,1); letter-spacing:.08em; margin-bottom:22px; }
     .step-line { width:26px; height:1px; background:rgba(255,255,255,.07); margin-bottom:22px; }
     .step-name { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.07em; color:rgba(255,255,255,.38); margin-bottom:13px; }
     .step-desc { font-size:12px; color:rgba(255,255,255,.17); line-height:1.85; }
@@ -478,7 +478,7 @@
     .ticker-item:nth-child(odd) { animation-delay:2s; }
 
     /* Step numbers fade glow */
-    @keyframes stepNumGlow { 0%,100%{opacity:.22;text-shadow:none} 50%{opacity:.42;text-shadow:0 0 40px rgba(255,255,255,.18)} }
+    @keyframes stepNumGlow { 0%,100%{opacity:.38;text-shadow:none} 50%{opacity:.72;text-shadow:0 0 40px rgba(255,255,255,.25)} }
     .step-num { animation:stepNumGlow 4s ease-in-out infinite; }
     .how-step:nth-child(2) .step-num { animation-delay:1.4s; }
     .how-step:nth-child(3) .step-num { animation-delay:2.8s; }
