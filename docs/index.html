@@ -67,7 +67,7 @@
 
     /* в”Ђв”Ђ HERO в”Ђв”Ђ */
     #hero { position:relative; height:100vh; min-height:680px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .hero-bg { position:absolute; inset:0; z-index:0; background:url('../public/bg.jpg') center 30%/cover no-repeat; filter:brightness(.35) saturate(.22); }
+    .hero-bg { position:absolute; inset:0; z-index:0; background:url('./bg.jpg') center 30%/cover no-repeat; filter:brightness(.35) saturate(.22); }
     .hero-bg::before {
       content:''; position:absolute; inset:0;
       background:
@@ -248,7 +248,7 @@
 
     /* в”Ђв”Ђ DOWNLOAD в”Ђв”Ђ */
     #download { padding:150px 48px; text-align:center; position:relative; overflow:hidden; }
-    .dl-bg { position:absolute; inset:0; background:url('../public/bg.jpg') center 60%/cover no-repeat; filter:brightness(.12) saturate(.14); z-index:0; }
+    .dl-bg { position:absolute; inset:0; background:url('./bg.jpg') center 60%/cover no-repeat; filter:brightness(.12) saturate(.14); z-index:0; }
     .dl-overlay {
       position:absolute; inset:0; z-index:0;
       background:
@@ -820,4 +820,5 @@ qsa('.tilt').forEach(card => {
 </script>
 </body>
 </html>
+
 
