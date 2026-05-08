@@ -227,7 +227,7 @@
     @keyframes drip { 0%{top:-100%} 100%{top:200%} }
 
     /* ── TICKER (horizontal marquee) ── */
-    #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.03); }
+    #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.03); background:rgba(3,3,4,.62) !important; }
     .ticker-track { display:flex; gap:0; white-space:nowrap; animation:tickerMove 35s linear infinite; }
     #ticker:hover .ticker-track { animation-play-state:paused; }
     @keyframes tickerMove { from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -300,9 +300,13 @@
 
     /* ── 3D CRYSTAL ── */
     #crystal-section {
-      padding:120px 48px; border-top:1px solid rgba(255,255,255,.03);
+      padding:80px 64px; border-top:1px solid rgba(255,255,255,.03);
       display:flex; align-items:center; justify-content:center; gap:80px;
-      max-width:1080px; margin:0 auto;
+      max-width:1080px; margin:40px auto;
+      background:rgba(3,3,4,.44) !important;
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,.07) !important;
+      border-radius:24px;
     }
     #crystal-canvas { flex-shrink:0; border-radius:50%; }
     .crystal-text { max-width:420px; }
@@ -342,9 +346,18 @@
     }
     .dl-btn:hover { background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.24); color:rgba(255,255,255,.95); box-shadow:0 0 60px rgba(255,255,255,.07), 0 22px 60px rgba(0,0,0,.55); }
     .dl-btn svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.6; }
-    .dl-meta { margin-top:26px; font-size:10px; letter-spacing:.2em; color:rgba(255,255,255,.09); }
-    .dl-pills { margin-top:44px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .dl-pill { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.14); padding:8px 16px; border:1px solid rgba(255,255,255,.04); border-radius:100px; }
+    .dl-meta {
+      margin-top:26px; font-size:10px; letter-spacing:.2em; color:rgba(255,255,255,.22);
+      padding:10px 24px; border:1px solid rgba(255,255,255,.06); border-radius:100px;
+      background:rgba(3,3,4,.42); backdrop-filter:blur(10px); display:inline-block;
+    }
+    .dl-pills { margin-top:28px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .dl-pill {
+      font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+      color:rgba(255,255,255,.28); padding:8px 18px;
+      border:1px solid rgba(255,255,255,.09); border-radius:100px;
+      background:rgba(3,3,4,.45); backdrop-filter:blur(10px);
+    }
 
     /* ── INSTALL GUIDE ── */
     #install { padding:0 48px 120px; max-width:860px; margin:0 auto; }
@@ -365,13 +378,14 @@
     .footer-logo { font-family:'Cinzel',serif; font-size:18px; letter-spacing:.42em; color:rgba(255,255,255,.22); }
     .footer-logo span { color:rgba(255,255,255,.09); }
     .footer-links { display:flex; gap:30px; list-style:none; flex-wrap:wrap; justify-content:center; }
-    .footer-links a { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.1); text-decoration:none; transition:color .3s, transform .3s; display:inline-block; }
+    .footer-links a { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.22); text-decoration:none; transition:color .3s, transform .3s; display:inline-block; }
     .footer-links a:hover { color:rgba(255,255,255,.38); transform:translateY(-2px); }
     .footer-contacts { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
     .footer-contact {
       display:inline-flex; align-items:center; gap:7px;
-      font-size:10px; letter-spacing:.14em; color:rgba(255,255,255,.12); text-decoration:none;
-      padding:8px 18px; border:1px solid rgba(255,255,255,.045); border-radius:100px;
+      font-size:10px; letter-spacing:.14em; color:rgba(255,255,255,.30); text-decoration:none;
+      padding:10px 22px; border:1px solid rgba(255,255,255,.09); border-radius:100px;
+      background:rgba(3,3,4,.45); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
       transition:color .35s, border-color .35s, transform .35s, background .35s;
     }
     .footer-contact svg { stroke:currentColor; fill:none; stroke-width:1.5; flex-shrink:0; }
@@ -580,51 +594,51 @@
 
     /* 8 уникальных паттернов покачивания */
     @keyframes swayA {
-      0%,100% { transform:translateY(0)       rotate(0deg); }
-      35%     { transform:translateY(-4px)     rotate(.5deg); }
-      70%     { transform:translateY(-2px)     rotate(-.3deg); }
+      0%,100% { transform:translateY(0)            rotate(0deg); }
+      35%     { transform:translateY(-10px)         rotate(1.2deg); }
+      70%     { transform:translateY(-5px)          rotate(-.7deg); }
     }
     @keyframes swayB {
-      0%,100% { transform:translateY(0)        rotate(0deg); }
-      45%     { transform:translateY(-5px)      rotate(-.6deg); }
-      80%     { transform:translateY(-1px)      rotate(.2deg); }
+      0%,100% { transform:translateY(0)            rotate(0deg); }
+      45%     { transform:translateY(-12px)         rotate(-1.4deg); }
+      80%     { transform:translateY(-4px)          rotate(.5deg); }
     }
     @keyframes swayC {
-      0%,100% { transform:translate(0,0)       rotate(0deg); }
-      30%     { transform:translate(2px,-4px)   rotate(.45deg); }
-      65%     { transform:translate(-1px,-6px)  rotate(-.35deg); }
+      0%,100% { transform:translate(0,0)           rotate(0deg); }
+      30%     { transform:translate(5px,-9px)       rotate(1.0deg); }
+      65%     { transform:translate(-3px,-13px)     rotate(-.8deg); }
     }
     @keyframes swayD {
-      0%,100% { transform:translate(0,0)       rotate(0deg); }
-      40%     { transform:translate(-2px,-3px)  rotate(-.5deg); }
-      75%     { transform:translate(1px,-2px)   rotate(.3deg); }
+      0%,100% { transform:translate(0,0)           rotate(0deg); }
+      40%     { transform:translate(-5px,-8px)      rotate(-1.2deg); }
+      75%     { transform:translate(3px,-5px)       rotate(.65deg); }
     }
     @keyframes swayE {
-      0%,100% { transform:translateY(0)        rotate(0deg); }
-      25%     { transform:translateY(-6px)      rotate(.7deg); }
-      60%     { transform:translateY(-3px)      rotate(-.45deg); }
-      85%     { transform:translateY(-1px)      rotate(.1deg); }
+      0%,100% { transform:translateY(0)            rotate(0deg); }
+      25%     { transform:translateY(-13px)         rotate(1.5deg); }
+      60%     { transform:translateY(-7px)          rotate(-1.0deg); }
+      85%     { transform:translateY(-3px)          rotate(.3deg); }
     }
     @keyframes swayF {
-      0%,100% { transform:translate(0,0)       rotate(0deg); }
-      20%     { transform:translate(1px,-2px)   rotate(.3deg); }
-      55%     { transform:translate(-2px,-5px)  rotate(-.55deg); }
-      80%     { transform:translate(0,-3px)     rotate(.2deg); }
+      0%,100% { transform:translate(0,0)           rotate(0deg); }
+      20%     { transform:translate(4px,-6px)       rotate(.8deg); }
+      55%     { transform:translate(-5px,-11px)     rotate(-1.25deg); }
+      80%     { transform:translate(2px,-6px)       rotate(.45deg); }
     }
     @keyframes swayG {
-      0%,100% { transform:translate(0,0)       rotate(0deg); }
-      50%     { transform:translate(-1px,-7px)  rotate(-.8deg); }
+      0%,100% { transform:translate(0,0)           rotate(0deg); }
+      50%     { transform:translate(-4px,-14px)     rotate(-1.7deg); }
     }
     @keyframes swayH {
-      0%,100% { transform:translate(0,0)       rotate(0deg); }
-      33%     { transform:translate(-1px,-3px)  rotate(.45deg); }
-      66%     { transform:translate(2px,-2px)   rotate(-.35deg); }
+      0%,100% { transform:translate(0,0)           rotate(0deg); }
+      33%     { transform:translate(-3px,-8px)      rotate(1.05deg); }
+      66%     { transform:translate(5px,-6px)       rotate(-.85deg); }
     }
 
     /* ── Float cards — каждая своя траектория ── */
-    @keyframes fcSway1 { 0%,100%{transform:translateY(0) rotate(-.5deg)} 35%{transform:translate(3px,-10px) rotate(.9deg)} 70%{transform:translate(-1px,-5px) rotate(-.3deg)} }
-    @keyframes fcSway2 { 0%,100%{transform:translateY(0) rotate(.4deg)}  45%{transform:translate(-3px,-12px) rotate(-.8deg)} 75%{transform:translate(2px,-6px) rotate(.25deg)} }
-    @keyframes fcSway3 { 0%,100%{transform:translateY(0) rotate(0)}      25%{transform:translate(2px,-8px) rotate(.65deg)} 65%{transform:translate(-3px,-13px) rotate(-.5deg)} 85%{transform:translate(1px,-4px) rotate(.15deg)} }
+    @keyframes fcSway1 { 0%,100%{transform:translateY(0) rotate(-1deg)} 35%{transform:translate(6px,-18px) rotate(2deg)} 70%{transform:translate(-3px,-9px) rotate(-.7deg)} }
+    @keyframes fcSway2 { 0%,100%{transform:translateY(0) rotate(.9deg)} 45%{transform:translate(-7px,-22px) rotate(-1.8deg)} 75%{transform:translate(4px,-11px) rotate(.5deg)} }
+    @keyframes fcSway3 { 0%,100%{transform:translateY(0) rotate(0)}     25%{transform:translate(5px,-15px) rotate(1.4deg)} 65%{transform:translate(-6px,-24px) rotate(-1.1deg)} 85%{transform:translate(2px,-8px) rotate(.3deg)} }
     .fc-1 { animation:fcSway1 6.5s ease-in-out infinite !important; animation-delay:0s !important; }
     .fc-2 { animation:fcSway2 7.8s ease-in-out infinite !important; animation-delay:1.5s !important; }
     .fc-3 { animation:fcSway3 5.8s ease-in-out infinite !important; animation-delay:3.1s !important; }
@@ -672,13 +686,13 @@
     /* ── Hero buttons — разные качели ── */
     @keyframes btnPSway {
       0%,100% { transform:translateY(0) rotate(0deg); }
-      35%     { transform:translateY(-3px) rotate(.3deg); }
-      70%     { transform:translateY(-1px) rotate(-.2deg); }
+      35%     { transform:translateY(-8px) rotate(.8deg); }
+      70%     { transform:translateY(-3px) rotate(-.5deg); }
     }
     @keyframes btnOSway {
       0%,100% { transform:translateY(0) rotate(0deg); }
-      45%     { transform:translateY(-4px) rotate(-.35deg); }
-      80%     { transform:translateY(-1px) rotate(.15deg); }
+      45%     { transform:translateY(-9px) rotate(-.9deg); }
+      80%     { transform:translateY(-3px) rotate(.4deg); }
     }
     .btn-primary { animation:btnPSway 6s ease-in-out infinite; }
     .btn-outline  { animation:btnOSway 7s ease-in-out infinite 2s; }
@@ -687,8 +701,8 @@
     /* ── Download button — собственное плавание + aurora ── */
     @keyframes dlBtnSway {
       0%,100% { transform:translateY(0) rotate(0deg); }
-      40%     { transform:translateY(-4px) rotate(.3deg); }
-      75%     { transform:translateY(-2px) rotate(-.2deg); }
+      40%     { transform:translateY(-10px) rotate(.7deg); }
+      75%     { transform:translateY(-4px) rotate(-.45deg); }
     }
     .dl-btn { animation:dlBtnSway 5.5s ease-in-out infinite, btnAurora 4s ease-in-out infinite; }
     .dl-btn:hover { animation-play-state:paused; }
