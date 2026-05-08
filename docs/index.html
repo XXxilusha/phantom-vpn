@@ -82,7 +82,10 @@
       will-change:transform,opacity; transform:translateZ(0);
     }
     @keyframes fogDrift { 0%{transform:translateX(0);opacity:.4;} 100%{transform:translateX(-28px);opacity:.85;} }
-    #hero-canvas { position:absolute; inset:0; z-index:2; pointer-events:none; }
+    /* full-page particle canvas — fixed behind everything */
+    #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    #hero-canvas { display:none; }
 
     .hero-content { position:relative; z-index:3; text-align:center; max-width:720px; padding:0 24px; }
     .hero-badge {
@@ -186,7 +189,8 @@
     /* ── FEATURES ── */
     #features { padding:120px 48px; max-width:1200px; margin:0 auto; }
     .sec-tag { font-size:9px; letter-spacing:.42em; text-transform:uppercase; color:rgba(255,255,255,.12); margin-bottom:18px; }
-    .sec-title { font-family:'Cinzel',serif; font-size:clamp(26px,4vw,46px); font-weight:500; letter-spacing:.04em; color:rgba(255,255,255,.52); margin-bottom:14px; line-height:1.25; overflow:hidden; }
+    .sec-title { font-family:'Cinzel',serif; font-size:clamp(26px,4vw,46px); font-weight:500; letter-spacing:.04em; color:rgba(255,255,255,.52); margin-bottom:14px; line-height:1.35; }
+    .sec-title .ch { display:inline-block; will-change:transform,opacity; }
     .sec-title em { font-style:italic; color:rgba(255,255,255,.22); }
     .sec-desc { font-size:13px; color:rgba(255,255,255,.18); max-width:460px; line-height:1.85; margin-bottom:64px; }
 
@@ -306,9 +310,72 @@
     .footer-links a { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.1); text-decoration:none; transition:color .3s; }
     .footer-links a:hover { color:rgba(255,255,255,.3); }
     .footer-copy { font-size:9px; color:rgba(255,255,255,.06); letter-spacing:.14em; }
+    /* ── SMOOTH SECTION TRANSITIONS ── */
+    section { transition: opacity .6s ease; }
+
+    /* feat-card shimmer on hover */
+    .feat-card { overflow:hidden; }
+    .feat-card::before {
+      content:''; position:absolute;
+      top:-60%; left:-60%; width:60%; height:200%;
+      background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.04) 50%, transparent 70%);
+      transform:translateX(-100%) rotate(10deg);
+      transition:transform .7s ease;
+    }
+    .feat-card:hover::before { transform:translateX(360%) rotate(10deg); }
+
+    /* float-card subtle float */
+    .float-card { animation:floatCard 5s ease-in-out infinite; }
+    .fc-1 { animation-delay:0s; }
+    .fc-2 { animation-delay:1.7s; }
+    .fc-3 { animation-delay:3.2s; }
+    @keyframes floatCard {
+      0%,100% { transform:translateY(0px); }
+      50%     { transform:translateY(-8px); }
+    }
+
+    /* stat-item reveal glow */
+    .stat-item {
+      transition: transform .4s ease;
+      cursor:default;
+    }
+    .stat-item:hover { transform:translateY(-4px); }
+    .stat-item:hover .stat-num { text-shadow:0 0 40px rgba(255,255,255,.12); }
+
+    /* step number glow on hover */
+    .how-step { transition:transform .4s ease; }
+    .how-step:hover { transform:translateX(6px); }
+    .how-step:hover .step-num { color:rgba(255,255,255,.1); transition:color .4s; }
+
+    /* crystal section glow pulse */
+    #crystal-canvas {
+      filter:drop-shadow(0 0 24px rgba(160,180,255,.08));
+      transition:filter .6s ease;
+    }
+    #crystal-canvas:hover { filter:drop-shadow(0 0 44px rgba(160,180,255,.14)); }
+
+    /* section separator glow */
+    #stats { border-top:1px solid rgba(255,255,255,.03); }
+    #features { border-top:1px solid rgba(255,255,255,.025); }
+
+    /* scroll-driven fade-in for sections */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* horizontal ticker smooth speed */
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .ticker-track { animation:ticker 28s linear infinite; }
+    .ticker-track:hover { animation-play-state:paused; }
+
+    /* step connecting line animated */
+    .step-line { transition:width .5s ease .2s, background .5s; }
+    .how-step:hover .step-line { width:48px; background:rgba(255,255,255,.18); }
   </style>
 </head>
 <body>
+
+<!-- Global particle canvas -->
+<canvas id="bg-canvas"></canvas>
 
 <!-- Loader -->
 <div id="loader">
@@ -590,60 +657,85 @@ window.addEventListener('scroll', () => {
   qs('#nav').classList.toggle('scrolled', scrollY > 50);
 }, { passive:true });
 
-/* ── HERO Three.js particles ── */
+/* ── FULL-PAGE Three.js particles (fixed bg canvas) ── */
 (function(){
   if (typeof THREE === 'undefined') return;
-  const canvas = qs('#hero-canvas');
+  const canvas = qs('#bg-canvas');
   const R = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:false });
   R.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   R.setSize(innerWidth, innerHeight);
-  R.setClearColor(0,0);
+  R.setClearColor(0, 0);
 
   const scene = new THREE.Scene();
-  const cam   = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, .1, 100);
+  const cam   = new THREE.PerspectiveCamera(72, innerWidth/innerHeight, .1, 100);
   cam.position.z = 5;
 
-  const N = 380, pos = new Float32Array(N*3), spd = new Float32Array(N), dX = new Float32Array(N);
-  for (let i=0;i<N;i++){
-    pos[i*3]   = (Math.random()-.5)*15;
-    pos[i*3+1] = (Math.random()-.5)*9;
-    pos[i*3+2] = (Math.random()-.5)*4;
-    spd[i] = .002 + Math.random()*.004;
-    dX[i]  = (Math.random()-.5)*.0007;
+  /* Layer 1: small fast particles */
+  const N1 = 440;
+  const pos1 = new Float32Array(N1*3), spd1 = new Float32Array(N1), dX1 = new Float32Array(N1);
+  for (let i=0;i<N1;i++){
+    pos1[i*3]   = (Math.random()-.5)*22;
+    pos1[i*3+1] = (Math.random()-.5)*13;
+    pos1[i*3+2] = (Math.random()-.5)*5;
+    spd1[i] = .0015 + Math.random()*.0035;
+    dX1[i]  = (Math.random()-.5)*.0006;
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ size:.027, color:0xffffff, transparent:true, opacity:.27, sizeAttenuation:true });
-  scene.add(new THREE.Points(geo, mat));
+  const geo1 = new THREE.BufferGeometry();
+  geo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
+  const mat1 = new THREE.PointsMaterial({ size:.022, color:0xffffff, transparent:true, opacity:.26, sizeAttenuation:true });
+  scene.add(new THREE.Points(geo1, mat1));
+
+  /* Layer 2: larger slow distant particles */
+  const N2 = 80;
+  const pos2 = new Float32Array(N2*3), spd2 = new Float32Array(N2);
+  for (let i=0;i<N2;i++){
+    pos2[i*3]   = (Math.random()-.5)*22;
+    pos2[i*3+1] = (Math.random()-.5)*13;
+    pos2[i*3+2] = -2 - Math.random()*3;
+    spd2[i] = .0005 + Math.random()*.001;
+  }
+  const geo2 = new THREE.BufferGeometry();
+  geo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+  const mat2 = new THREE.PointsMaterial({ size:.055, color:0xaabbff, transparent:true, opacity:.09, sizeAttenuation:true });
+  scene.add(new THREE.Points(geo2, mat2));
 
   let mx=0, my=0, ticking=false;
   window.addEventListener('mousemove', e => {
     if (ticking) return; ticking=true;
-    setTimeout(()=>{ mx=(e.clientX/innerWidth-.5)*.38; my=-(e.clientY/innerHeight-.5)*.28; ticking=false; }, 16);
-  });
-
-  /* fade on scroll */
-  let scrollFade = 1;
-  window.addEventListener('scroll', () => { scrollFade = Math.max(0, 1 - scrollY / innerHeight * 1.4); }, { passive:true });
+    setTimeout(()=>{ mx=(e.clientX/innerWidth-.5)*.32; my=-(e.clientY/innerHeight-.5)*.22; ticking=false; }, 16);
+  }, { passive:true });
 
   function tick(){
     requestAnimationFrame(tick);
-    if (scrollY > innerHeight * 1.2) return; /* skip when off screen */
-    const a = geo.attributes.position.array;
-    for (let i=0;i<N;i++){
-      a[i*3]   += dX[i];
-      a[i*3+1] += spd[i];
-      if (a[i*3+1]>4.6){ a[i*3+1]=-4.6; a[i*3]=(Math.random()-.5)*15; }
+
+    /* Layer 1 */
+    const a1 = geo1.attributes.position.array;
+    for (let i=0;i<N1;i++){
+      a1[i*3]   += dX1[i];
+      a1[i*3+1] += spd1[i];
+      if (a1[i*3+1] > 6.6){ a1[i*3+1]=-6.6; a1[i*3]=(Math.random()-.5)*22; }
     }
-    geo.attributes.position.needsUpdate = true;
-    mat.opacity = .27 * scrollFade;
-    cam.position.x += (mx - cam.position.x)*.04;
-    cam.position.y += (my - cam.position.y)*.04;
+    geo1.attributes.position.needsUpdate = true;
+
+    /* Layer 2 */
+    const a2 = geo2.attributes.position.array;
+    for (let i=0;i<N2;i++){
+      a2[i*3+1] += spd2[i];
+      if (a2[i*3+1] > 6.6){ a2[i*3+1]=-6.6; a2[i*3]=(Math.random()-.5)*22; }
+    }
+    geo2.attributes.position.needsUpdate = true;
+
+    cam.position.x += (mx - cam.position.x)*.035;
+    cam.position.y += (my - cam.position.y)*.035;
     cam.lookAt(0,0,0);
     R.render(scene, cam);
   }
   tick();
-  window.addEventListener('resize', ()=>{ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); R.setSize(innerWidth,innerHeight); });
+  window.addEventListener('resize', ()=>{
+    cam.aspect=innerWidth/innerHeight;
+    cam.updateProjectionMatrix();
+    R.setSize(innerWidth,innerHeight);
+  });
 })();
 
 /* ── TICKER build ── */
@@ -740,33 +832,52 @@ window.addEventListener('scroll', () => {
   /* features */
   gsap.from('.feat-card',{ opacity:0, y:30, stagger:.07, duration:.65, ease, scrollTrigger:{ trigger:'.features-grid', start:'top 82%' }});
 
-  /* section titles char reveal */
+  /* section titles char reveal — regex keeps HTML tags intact */
   qsa('.sec-title').forEach(el => {
-    const html = el.innerHTML.replace(/([^<>]{1})/g, '<span class="ch">$1</span>');
+    /* match either a full HTML tag (preserve it) OR a single non-tag character (wrap it) */
+    const html = el.innerHTML.replace(/(<[^>]*>)|([^<>])/g, (m, tag, ch) =>
+      tag ? tag : `<span class="ch">${ch}</span>`
+    );
     el.innerHTML = html;
     gsap.from(el.querySelectorAll('.ch'), {
-      opacity:0, y:24, rotateX:-60,
-      stagger:.018, duration:.45, ease:'back.out(1.5)',
+      opacity:0, y:20, rotateX:-50,
+      stagger:.014, duration:.5, ease:'back.out(1.4)',
       scrollTrigger:{ trigger:el, start:'top 88%' }
     });
   });
 
-  /* how steps */
-  gsap.from('.how-step',{ opacity:0, x:-24, stagger:.15, duration:.75, ease, scrollTrigger:{ trigger:'.how-steps', start:'top 82%' }});
+  /* how steps — stagger from left with delay */
+  gsap.from('.how-step',{ opacity:0, x:-28, stagger:.18, duration:.8, ease:'power3.out', scrollTrigger:{ trigger:'.how-steps', start:'top 82%' }});
 
-  /* crystal */
-  gsap.from('#crystal-canvas',{ opacity:0, scale:.85, duration:1.1, ease, scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
-  gsap.from('.crystal-text',  { opacity:0, x:30,     duration:1.0, ease, scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
+  /* ticker fade-in */
+  gsap.from('#ticker',{ opacity:0, duration:1.2, ease, scrollTrigger:{ trigger:'#ticker', start:'top 95%' }});
+
+  /* crystal — spin entrance */
+  gsap.from('#crystal-canvas',{ opacity:0, scale:.8, rotation:-8, duration:1.3, ease:'power3.out', scrollTrigger:{ trigger:'#crystal-section', start:'top 80%' }});
+  gsap.from('.crystal-text > *',{ opacity:0, x:36, stagger:.14, duration:.95, ease:'power3.out', scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
 
   /* download */
-  gsap.from('#download .sec-tag, #download .dl-title, #download .dl-sub, #download .dl-btn-wrap, #download .dl-meta, #download .dl-pills',
-    { opacity:0, y:22, stagger:.1, duration:.8, ease, scrollTrigger:{ trigger:'#download', start:'top 82%' }});
+  gsap.from('#download .sec-tag',  { opacity:0, y:16, duration:.6, ease, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('#download .dl-title', { opacity:0, y:24, duration:.7, ease, delay:.12, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('#download .dl-sub',   { opacity:0, y:16, duration:.6, ease, delay:.22, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('.dl-btn-wrap',        { opacity:0, scale:.92, duration:.8, ease:'back.out(1.3)', delay:.3, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
+  gsap.from('.dl-pills .dl-pill',  { opacity:0, y:10, stagger:.05, duration:.5, ease, delay:.4, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
 
   /* install */
-  gsap.from('.install-card',{ opacity:0, y:20, stagger:.09, duration:.65, ease, scrollTrigger:{ trigger:'#install', start:'top 85%' }});
+  gsap.from('.install-card',{ opacity:0, y:22, stagger:.1, duration:.7, ease:'power3.out', scrollTrigger:{ trigger:'#install', start:'top 86%' }});
 
   /* footer */
-  gsap.from('footer > *',{ opacity:0, y:16, stagger:.12, duration:.6, ease, scrollTrigger:{ trigger:'footer', start:'top 90%' }});
+  gsap.from('footer > *',{ opacity:0, y:18, stagger:.13, duration:.65, ease, scrollTrigger:{ trigger:'footer', start:'top 92%' }});
+
+  /* features sec-tag & sec-desc */
+  gsap.from('#features .sec-tag, #features .sec-desc',{ opacity:0, y:14, stagger:.14, duration:.65, ease, scrollTrigger:{ trigger:'#features', start:'top 86%' }});
+  gsap.from('#how .sec-tag',{ opacity:0, y:14, duration:.65, ease, scrollTrigger:{ trigger:'#how', start:'top 86%' }});
+
+  /* subtle parallax on hero bg */
+  gsap.to('.hero-bg',{ yPercent:-14, ease:'none', scrollTrigger:{ trigger:'#hero', start:'top top', end:'bottom top', scrub:true }});
+
+  /* stats section slightly scale up on enter */
+  gsap.from('#stats',{ opacity:0, duration:.9, ease, scrollTrigger:{ trigger:'#stats', start:'top 90%' }});
 })();
 
 /* ── MAGNETIC BUTTONS ── */
