@@ -16,8 +16,26 @@
   <style>
     /* ── RESET ── */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior: smooth; }
-    body { font-family:'Inter',sans-serif; background:#030304; color:rgba(255,255,255,.55); overflow-x:hidden; }
+    html { scroll-behavior: smooth; background:#030304; }
+    body { font-family:'Inter',sans-serif; background:transparent; color:rgba(255,255,255,.55); overflow-x:hidden; }
+
+    /* ── CASTLE BACKGROUND (everywhere) ── */
+    #page-bg {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:url('./bg.jpg') center 30%/cover no-repeat;
+      filter:brightness(.18) saturate(.18);
+      transform:translateZ(0);
+    }
+    #bg-canvas { position:fixed; inset:0; z-index:1; pointer-events:none; }
+
+    /* ── SEMI-TRANSPARENT SECTION OVERLAYS ── */
+    #stats    { background:rgba(3,3,4,.78); }
+    #ticker   { background:rgba(3,3,4,.62); }
+    #features { background:rgba(3,3,4,.76); }
+    #how      { background:rgba(3,3,4,.82); border-top:1px solid rgba(255,255,255,.03); }
+    #crystal-section { background:rgba(3,3,4,.5); }
+    #install  { background:rgba(3,3,4,.82); }
+    footer    { background:rgba(3,3,4,.92); }
     ::-webkit-scrollbar { width:3px; }
     ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.06); border-radius:2px; }
 
@@ -66,7 +84,8 @@
 
     /* ── HERO ── */
     #hero { position:relative; height:100vh; min-height:680px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .hero-bg { position:absolute; inset:0; z-index:0; background:url('../public/bg.jpg') center 30%/cover no-repeat; filter:brightness(.35) saturate(.22); }
+    /* hero-bg is now transparent — global #page-bg covers the castle image */
+    .hero-bg { position:absolute; inset:0; z-index:0; }
     .hero-bg::before {
       content:''; position:absolute; inset:0;
       background:
@@ -82,9 +101,7 @@
       will-change:transform,opacity; transform:translateZ(0);
     }
     @keyframes fogDrift { 0%{transform:translateX(0);opacity:.4;} 100%{transform:translateX(-28px);opacity:.85;} }
-    /* full-page particle canvas — fixed behind everything */
-    #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
+    /* hero-canvas is replaced by the global bg-canvas */
     #hero-canvas { display:none; }
 
     .hero-content { position:relative; z-index:3; text-align:center; max-width:720px; padding:0 24px; }
@@ -163,9 +180,13 @@
     .scroll-hint { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); z-index:3; display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; animation:fUp .8s 3s ease forwards; }
     @keyframes fUp { to { opacity:1; } }
     .scroll-hint span { font-size:9px; letter-spacing:.32em; text-transform:uppercase; color:rgba(255,255,255,.12); }
-    .scroll-line { width:1px; height:44px; background:rgba(255,255,255,.07); position:relative; overflow:hidden; }
-    .scroll-line::after { content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:rgba(255,255,255,.35); animation:drip 2s ease-in-out infinite; }
-    @keyframes drip { to { top:100%; } }
+    .scroll-line { width:1px; height:44px; background:rgba(255,255,255,.06); position:relative; overflow:hidden; }
+    .scroll-line::after {
+      content:''; position:absolute; top:-100%; left:0; width:100%; height:100%;
+      background:linear-gradient(to bottom, transparent, rgba(255,255,255,.7), transparent);
+      animation:drip 1.8s ease-in-out infinite;
+    }
+    @keyframes drip { 0%{top:-100%} 100%{top:200%} }
 
     /* ── TICKER (horizontal marquee) ── */
     #ticker { overflow:hidden; padding:20px 0; border-top:1px solid rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.03); }
@@ -251,7 +272,8 @@
 
     /* ── DOWNLOAD ── */
     #download { padding:150px 48px; text-align:center; position:relative; overflow:hidden; }
-    .dl-bg { position:absolute; inset:0; background:url('../public/bg.jpg') center 60%/cover no-repeat; filter:brightness(.12) saturate(.14); z-index:0; }
+    /* download section uses global castle bg — just darkens it more */
+    .dl-bg { position:absolute; inset:0; background:rgba(3,3,4,.6); z-index:0; }
     .dl-overlay {
       position:absolute; inset:0; z-index:0;
       background:
@@ -307,11 +329,50 @@
     .footer-logo { font-family:'Cinzel',serif; font-size:18px; letter-spacing:.42em; color:rgba(255,255,255,.22); }
     .footer-logo span { color:rgba(255,255,255,.09); }
     .footer-links { display:flex; gap:30px; list-style:none; flex-wrap:wrap; justify-content:center; }
-    .footer-links a { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.1); text-decoration:none; transition:color .3s; }
-    .footer-links a:hover { color:rgba(255,255,255,.3); }
+    .footer-links a { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.1); text-decoration:none; transition:color .3s, transform .3s; display:inline-block; }
+    .footer-links a:hover { color:rgba(255,255,255,.38); transform:translateY(-2px); }
+    .footer-contacts { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+    .footer-contact {
+      display:inline-flex; align-items:center; gap:7px;
+      font-size:10px; letter-spacing:.14em; color:rgba(255,255,255,.12); text-decoration:none;
+      padding:8px 18px; border:1px solid rgba(255,255,255,.045); border-radius:100px;
+      transition:color .35s, border-color .35s, transform .35s, background .35s;
+    }
+    .footer-contact svg { stroke:currentColor; fill:none; stroke-width:1.5; flex-shrink:0; }
+    .footer-contact:hover { color:rgba(255,255,255,.5); border-color:rgba(255,255,255,.15); transform:translateY(-2px); background:rgba(255,255,255,.03); }
     .footer-copy { font-size:9px; color:rgba(255,255,255,.06); letter-spacing:.14em; }
-    /* ── SMOOTH SECTION TRANSITIONS ── */
-    section { transition: opacity .6s ease; }
+
+    /* ── NAV LINK UNDERLINE SLIDE ── */
+    .nav-links a { position:relative; }
+    .nav-links a::after { content:''; position:absolute; bottom:-3px; left:0; width:0; height:1px; background:rgba(255,255,255,.25); transition:width .35s ease; }
+    .nav-links a:hover::after { width:100%; }
+
+    /* ── FEAT CARD ICON PULSE ON HOVER ── */
+    .feat-card:hover .feat-icon { border-color:rgba(255,255,255,.14); background:rgba(255,255,255,.06); transition:all .4s; }
+    .feat-card:hover .feat-icon svg { stroke:rgba(255,255,255,.55); transition:stroke .4s; }
+
+    /* ── HOW STEP NUM GLOW ── */
+    .step-num { transition:color .5s, text-shadow .5s; }
+    .how-step:hover .step-num { color:rgba(255,255,255,.12); text-shadow:0 0 40px rgba(255,255,255,.08); }
+
+    /* ── DOWNLOAD BTN PULSE LINE ── */
+    .dl-btn::after { content:''; position:absolute; inset:0; border-radius:100px; border:1px solid rgba(255,255,255,.12); opacity:0; transform:scale(1); transition:opacity .4s, transform .4s; }
+    .dl-btn:hover::after { opacity:0; transform:scale(1.06); }
+
+    /* ── INSTALL CARD NUM REVEAL ── */
+    .install-card { transition:background .35s, transform .4s; }
+    .install-card:hover { transform:translateY(-3px); }
+    .install-card:hover .install-n { color:rgba(255,255,255,.28); transition:color .4s; }
+
+    /* ── FLOATING BADGE PULSE ── */
+    @keyframes badgePulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.08);} 50%{box-shadow:0 0 0 6px rgba(255,255,255,0);} }
+    .hero-badge { animation:badgePulse 3s ease-in-out infinite, none; }
+
+    /* ── CRYSTAL WIRE ROTATE SPEED UP ON HOVER ── */
+    #crystal-section:hover #crystal-canvas { filter:drop-shadow(0 0 55px rgba(160,190,255,.18)); }
+    /* ── SECTIONS ABOVE FIXED CANVAS ── */
+    section, footer, nav { position:relative; z-index:2; }
+    #hero { z-index:3; } /* hero already has its own bg */
 
     /* feat-card shimmer on hover */
     .feat-card { overflow:hidden; }
@@ -374,6 +435,8 @@
 </head>
 <body>
 
+<!-- Castle background (fixed, everywhere) -->
+<div id="page-bg"></div>
 <!-- Global particle canvas -->
 <canvas id="bg-canvas"></canvas>
 
@@ -599,6 +662,16 @@
     <li><a href="#download">Скачать</a></li>
     <li><a href="#install">Установка</a></li>
   </ul>
+  <div class="footer-contacts">
+    <a href="https://github.com/XXxilusha" target="_blank" class="footer-contact">
+      <svg viewBox="0 0 24 24" width="13" height="13"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      github.com/XXxilusha
+    </a>
+    <a href="mailto:1249952@mtp.by" class="footer-contact">
+      <svg viewBox="0 0 24 24" width="13" height="13"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      1249952@mtp.by
+    </a>
+  </div>
   <p class="footer-copy">© 2026 Phantom VPN &nbsp;·&nbsp; Сквозь туман, незримы</p>
 </footer>
 
@@ -832,16 +905,16 @@ window.addEventListener('scroll', () => {
   /* features */
   gsap.from('.feat-card',{ opacity:0, y:30, stagger:.07, duration:.65, ease, scrollTrigger:{ trigger:'.features-grid', start:'top 82%' }});
 
-  /* section titles char reveal — regex keeps HTML tags intact */
+  /* section titles char reveal — keeps HTML tags + whitespace intact */
   qsa('.sec-title').forEach(el => {
-    /* match either a full HTML tag (preserve it) OR a single non-tag character (wrap it) */
-    const html = el.innerHTML.replace(/(<[^>]*>)|([^<>])/g, (m, tag, ch) =>
-      tag ? tag : `<span class="ch">${ch}</span>`
+    /* tag preserved | whitespace preserved | single char wrapped */
+    const html = el.innerHTML.replace(/(<[^>]*>)|(\s+)|([^<>\s])/g,
+      (m, tag, space, ch) => tag ? tag : space ? space : `<span class="ch">${ch}</span>`
     );
     el.innerHTML = html;
     gsap.from(el.querySelectorAll('.ch'), {
-      opacity:0, y:20, rotateX:-50,
-      stagger:.014, duration:.5, ease:'back.out(1.4)',
+      opacity:0, y:18, rotateX:-45,
+      stagger:.016, duration:.5, ease:'back.out(1.4)',
       scrollTrigger:{ trigger:el, start:'top 88%' }
     });
   });
