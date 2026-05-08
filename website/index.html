@@ -736,14 +736,8 @@
     .footer-links li:nth-child(4) a { animation:swayH 4.2s ease-in-out infinite 2.4s; display:inline-block; }
     .footer-links a:hover { animation-play-state:paused; }
 
-    /* ── Crystal section — пассивное покачивание всего блока ── */
-    @keyframes crystalBlockSway {
-      0%,100% { transform:translate(0,0)    rotate(0deg); }
-      28%     { transform:translate(3px,-8px) rotate(.35deg); }
-      58%     { transform:translate(-4px,-5px) rotate(-.28deg); }
-      80%     { transform:translate(2px,-3px) rotate(.15deg); }
-    }
-    #crystal-section { animation:crystalBlockSway 9s ease-in-out infinite; will-change:transform; }
+    /* crystal-section float — управляется через GSAP */
+    #crystal-section { will-change:transform; }
   </style>
 </head>
 <body>
@@ -1254,6 +1248,21 @@ window.addEventListener('scroll', () => {
   /* crystal — spin entrance */
   gsap.from('#crystal-canvas',{ opacity:0, scale:.8, rotation:-8, duration:1.3, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#crystal-section', start:'top 80%' }});
   gsap.from('.crystal-text > *',{ opacity:0, x:36, stagger:.14, duration:.95, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#crystal-section', start:'top 78%' }});
+
+  /* Crystal block — continuous float */
+  (function floatCrystal(){
+    gsap.to('#crystal-section', {
+      y:-18, x:6, rotation:.6,
+      duration:3.2, ease:'sine.inOut',
+      onComplete: function(){
+        gsap.to('#crystal-section', {
+          y:0, x:0, rotation:0,
+          duration:3.0, ease:'sine.inOut',
+          onComplete: floatCrystal
+        });
+      }
+    });
+  })();
 
   /* download */
   gsap.from('#download .sec-tag',  { opacity:0, y:16, duration:.6, ease, scrollTrigger:{ trigger:'#download', start:'top 85%' }});
