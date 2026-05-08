@@ -569,6 +569,148 @@
     /* step connecting line animated */
     .step-line { transition:width .5s ease .2s, background .5s; }
     .how-step:hover .step-line { width:48px; background:rgba(255,255,255,.18); }
+
+    /* ═══════════════════════════════════════════════════
+       INDIVIDUAL SWAY — каждый элемент качается по-своему
+       ═══════════════════════════════════════════════════ */
+
+    /* 8 уникальных паттернов покачивания */
+    @keyframes swayA {
+      0%,100% { transform:translateY(0)       rotate(0deg); }
+      35%     { transform:translateY(-4px)     rotate(.5deg); }
+      70%     { transform:translateY(-2px)     rotate(-.3deg); }
+    }
+    @keyframes swayB {
+      0%,100% { transform:translateY(0)        rotate(0deg); }
+      45%     { transform:translateY(-5px)      rotate(-.6deg); }
+      80%     { transform:translateY(-1px)      rotate(.2deg); }
+    }
+    @keyframes swayC {
+      0%,100% { transform:translate(0,0)       rotate(0deg); }
+      30%     { transform:translate(2px,-4px)   rotate(.45deg); }
+      65%     { transform:translate(-1px,-6px)  rotate(-.35deg); }
+    }
+    @keyframes swayD {
+      0%,100% { transform:translate(0,0)       rotate(0deg); }
+      40%     { transform:translate(-2px,-3px)  rotate(-.5deg); }
+      75%     { transform:translate(1px,-2px)   rotate(.3deg); }
+    }
+    @keyframes swayE {
+      0%,100% { transform:translateY(0)        rotate(0deg); }
+      25%     { transform:translateY(-6px)      rotate(.7deg); }
+      60%     { transform:translateY(-3px)      rotate(-.45deg); }
+      85%     { transform:translateY(-1px)      rotate(.1deg); }
+    }
+    @keyframes swayF {
+      0%,100% { transform:translate(0,0)       rotate(0deg); }
+      20%     { transform:translate(1px,-2px)   rotate(.3deg); }
+      55%     { transform:translate(-2px,-5px)  rotate(-.55deg); }
+      80%     { transform:translate(0,-3px)     rotate(.2deg); }
+    }
+    @keyframes swayG {
+      0%,100% { transform:translate(0,0)       rotate(0deg); }
+      50%     { transform:translate(-1px,-7px)  rotate(-.8deg); }
+    }
+    @keyframes swayH {
+      0%,100% { transform:translate(0,0)       rotate(0deg); }
+      33%     { transform:translate(-1px,-3px)  rotate(.45deg); }
+      66%     { transform:translate(2px,-2px)   rotate(-.35deg); }
+    }
+
+    /* ── Float cards — каждая своя траектория ── */
+    @keyframes fcSway1 { 0%,100%{transform:translateY(0) rotate(-.5deg)} 35%{transform:translate(3px,-10px) rotate(.9deg)} 70%{transform:translate(-1px,-5px) rotate(-.3deg)} }
+    @keyframes fcSway2 { 0%,100%{transform:translateY(0) rotate(.4deg)}  45%{transform:translate(-3px,-12px) rotate(-.8deg)} 75%{transform:translate(2px,-6px) rotate(.25deg)} }
+    @keyframes fcSway3 { 0%,100%{transform:translateY(0) rotate(0)}      25%{transform:translate(2px,-8px) rotate(.65deg)} 65%{transform:translate(-3px,-13px) rotate(-.5deg)} 85%{transform:translate(1px,-4px) rotate(.15deg)} }
+    .fc-1 { animation:fcSway1 6.5s ease-in-out infinite !important; animation-delay:0s !important; }
+    .fc-2 { animation:fcSway2 7.8s ease-in-out infinite !important; animation-delay:1.5s !important; }
+    .fc-3 { animation:fcSway3 5.8s ease-in-out infinite !important; animation-delay:3.1s !important; }
+
+    /* ── Feature cards — у каждой уникальный ритм ── */
+    .features-grid .feat-card { will-change:transform; }
+    .features-grid .feat-card:nth-child(1) { animation:swayA 5.5s ease-in-out infinite 0s; }
+    .features-grid .feat-card:nth-child(2) { animation:swayB 6.2s ease-in-out infinite .9s; }
+    .features-grid .feat-card:nth-child(3) { animation:swayC 4.9s ease-in-out infinite 1.6s; }
+    .features-grid .feat-card:nth-child(4) { animation:swayD 7.1s ease-in-out infinite 2.3s; }
+    .features-grid .feat-card:nth-child(5) { animation:swayE 5.3s ease-in-out infinite .5s; }
+    .features-grid .feat-card:nth-child(6) { animation:swayF 6.8s ease-in-out infinite 1.2s; }
+
+    /* ── Install cards — разные покачивания ── */
+    .install-grid .install-card { will-change:transform; }
+    .install-grid .install-card:nth-child(1) { animation:swayG 5.2s ease-in-out infinite 0s; }
+    .install-grid .install-card:nth-child(2) { animation:swayH 6.4s ease-in-out infinite 1.2s; }
+    .install-grid .install-card:nth-child(3) { animation:swayB 5.7s ease-in-out infinite 2.4s; }
+    .install-grid .install-card:nth-child(4) { animation:swayD 4.9s ease-in-out infinite .7s; }
+
+    /* ── Stats — каждый элемент в своей фазе ── */
+    .stats-grid .stat-item { will-change:transform; }
+    .stats-grid .stat-item:nth-child(1) { animation:swayC 6.0s ease-in-out infinite 0s; }
+    .stats-grid .stat-item:nth-child(2) { animation:swayA 5.5s ease-in-out infinite 1.5s; }
+    .stats-grid .stat-item:nth-child(3) { animation:swayF 7.0s ease-in-out infinite .8s; }
+    .stats-grid .stat-item:nth-child(4) { animation:swayH 6.2s ease-in-out infinite 2.1s; }
+    .stat-item:hover { animation-play-state:paused; transform:translateY(-5px) !important; }
+
+    /* ── How steps — шагают по-разному ── */
+    .how-steps .how-step { will-change:transform; }
+    .how-steps .how-step:nth-child(1) { animation:swayE 5.8s ease-in-out infinite 0s; }
+    .how-steps .how-step:nth-child(2) { animation:swayG 6.5s ease-in-out infinite 1.3s; }
+    .how-steps .how-step:nth-child(3) { animation:swayD 5.1s ease-in-out infinite 2.6s; }
+    .how-step:hover { animation-play-state:paused; transform:translateX(8px) !important; }
+
+    /* ── Nav CTA — лёгкое дыхание ── */
+    @keyframes navCtaSway {
+      0%,100% { transform:translateY(0) rotate(0deg); }
+      40%     { transform:translateY(-2px) rotate(.2deg); }
+      70%     { transform:translateY(-1px) rotate(-.15deg); }
+    }
+    .nav-cta { animation:navCtaSway 5s ease-in-out infinite; }
+    .nav-cta:hover { animation-play-state:paused; }
+
+    /* ── Hero buttons — разные качели ── */
+    @keyframes btnPSway {
+      0%,100% { transform:translateY(0) rotate(0deg); }
+      35%     { transform:translateY(-3px) rotate(.3deg); }
+      70%     { transform:translateY(-1px) rotate(-.2deg); }
+    }
+    @keyframes btnOSway {
+      0%,100% { transform:translateY(0) rotate(0deg); }
+      45%     { transform:translateY(-4px) rotate(-.35deg); }
+      80%     { transform:translateY(-1px) rotate(.15deg); }
+    }
+    .btn-primary { animation:btnPSway 6s ease-in-out infinite; }
+    .btn-outline  { animation:btnOSway 7s ease-in-out infinite 2s; }
+    .btn-primary:hover, .btn-outline:hover { animation-play-state:paused; }
+
+    /* ── Download button — собственное плавание + aurora ── */
+    @keyframes dlBtnSway {
+      0%,100% { transform:translateY(0) rotate(0deg); }
+      40%     { transform:translateY(-4px) rotate(.3deg); }
+      75%     { transform:translateY(-2px) rotate(-.2deg); }
+    }
+    .dl-btn { animation:dlBtnSway 5.5s ease-in-out infinite, btnAurora 4s ease-in-out infinite; }
+    .dl-btn:hover { animation-play-state:paused; }
+
+    /* ── Download pills — стаггерная волна ── */
+    .dl-pills .dl-pill { will-change:transform; }
+    .dl-pills .dl-pill:nth-child(1) { animation:swayA 4.5s ease-in-out infinite 0s; }
+    .dl-pills .dl-pill:nth-child(2) { animation:swayG 4.2s ease-in-out infinite .6s; }
+    .dl-pills .dl-pill:nth-child(3) { animation:swayB 5.0s ease-in-out infinite 1.2s; }
+    .dl-pills .dl-pill:nth-child(4) { animation:swayH 4.7s ease-in-out infinite 1.8s; }
+    .dl-pills .dl-pill:nth-child(5) { animation:swayD 4.3s ease-in-out infinite .9s; }
+
+    /* ── Footer contacts — покачиваются в разные стороны ── */
+    @keyframes contactSway1 { 0%,100%{transform:translate(0,0) rotate(0)} 45%{transform:translate(1px,-3px) rotate(.28deg)} }
+    @keyframes contactSway2 { 0%,100%{transform:translate(0,0) rotate(0)} 55%{transform:translate(-1px,-3px) rotate(-.28deg)} }
+    .footer-contacts .footer-contact:nth-child(1) { animation:contactSway1 5.5s ease-in-out infinite; }
+    .footer-contacts .footer-contact:nth-child(2) { animation:contactSway2 6.2s ease-in-out infinite 1.8s; }
+    .footer-contact:hover { animation-play-state:paused; }
+
+    /* ── Footer nav links — мелкие покачивания ── */
+    .footer-links li { display:inline-block; }
+    .footer-links li:nth-child(1) a { animation:swayA 5s ease-in-out infinite 0s; display:inline-block; }
+    .footer-links li:nth-child(2) a { animation:swayG 4.5s ease-in-out infinite .8s; display:inline-block; }
+    .footer-links li:nth-child(3) a { animation:swayB 5.8s ease-in-out infinite 1.6s; display:inline-block; }
+    .footer-links li:nth-child(4) a { animation:swayH 4.2s ease-in-out infinite 2.4s; display:inline-block; }
+    .footer-links a:hover { animation-play-state:paused; }
   </style>
 </head>
 <body>
@@ -1112,7 +1254,8 @@ window.addEventListener('scroll', () => {
     btn.addEventListener('mouseenter', () => { on = true; });
     btn.addEventListener('mouseleave', () => {
       on = false;
-      gsap.to(btn, { x:0, y:0, duration:.5, ease:'elastic.out(1,.5)' });
+      gsap.to(btn, { x:0, y:0, duration:.5, ease:'elastic.out(1,.5)',
+        onComplete: () => gsap.set(btn, { clearProps:'transform' }) });
     });
     btn.addEventListener('mousemove', e => {
       if (!on) return;
@@ -1129,7 +1272,7 @@ window.addEventListener('scroll', () => {
   if (cta) {
     let on=false;
     cta.addEventListener('mouseenter',()=>{on=true;});
-    cta.addEventListener('mouseleave',()=>{ on=false; gsap.to(cta,{x:0,y:0,duration:.4,ease:'elastic.out(1,.5)'}); });
+    cta.addEventListener('mouseleave',()=>{ on=false; gsap.to(cta,{x:0,y:0,duration:.4,ease:'elastic.out(1,.5)', onComplete:()=>gsap.set(cta,{clearProps:'transform'})}); });
     cta.addEventListener('mousemove', e=>{
       if(!on) return;
       const r=cta.getBoundingClientRect();
