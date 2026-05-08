@@ -120,8 +120,14 @@
     .nav-logo { font-family:'Cinzel',serif; font-size:16px; letter-spacing:.35em; color:rgba(255,255,255,.5); text-decoration:none; }
     .nav-logo span { color:rgba(255,255,255,.16); }
     .nav-links { display:flex; gap:36px; list-style:none; }
-    .nav-links a { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.22); text-decoration:none; transition:color .3s; }
-    .nav-links a:hover { color:rgba(255,255,255,.6); }
+    .nav-links a {
+      font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+      color:rgba(255,255,255,.30); text-decoration:none; transition:color .3s, background .3s;
+      padding:6px 14px; border-radius:100px;
+      background:rgba(3,3,4,.42); backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.055);
+    }
+    .nav-links a:hover { color:rgba(255,255,255,.7); background:rgba(255,255,255,.06); }
     .nav-cta {
       font-size:10px; letter-spacing:.18em; text-transform:uppercase;
       color:rgba(255,255,255,.38); text-decoration:none;
@@ -729,6 +735,15 @@
     .footer-links li:nth-child(3) a { animation:swayB 5.8s ease-in-out infinite 1.6s; display:inline-block; }
     .footer-links li:nth-child(4) a { animation:swayH 4.2s ease-in-out infinite 2.4s; display:inline-block; }
     .footer-links a:hover { animation-play-state:paused; }
+
+    /* ── Crystal section — пассивное покачивание всего блока ── */
+    @keyframes crystalBlockSway {
+      0%,100% { transform:translate(0,0)    rotate(0deg); }
+      28%     { transform:translate(3px,-8px) rotate(.35deg); }
+      58%     { transform:translate(-4px,-5px) rotate(-.28deg); }
+      80%     { transform:translate(2px,-3px) rotate(.15deg); }
+    }
+    #crystal-section { animation:crystalBlockSway 9s ease-in-out infinite; will-change:transform; }
   </style>
 </head>
 <body>
