@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xxxilusha.github.io/phantom-vpn/sitemap.xml
