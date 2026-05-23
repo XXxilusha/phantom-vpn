@@ -11,6 +11,7 @@ class WarpManager {
     this.autoStart = false;
     this.familiesMode = 'off'; // 'off' | 'malware' | 'full'
     this.splitHosts = [];
+    this.update = null; // { available, latest, url } | null
     this.stats = {
       ping: 0, downloadSpeed: -1, uploadSpeed: -1,
       totalDownload: 0, totalUpload: 0,
@@ -63,6 +64,7 @@ class WarpManager {
       autoStart: this.autoStart,
       familiesMode: this.familiesMode,
       splitHosts: [...this.splitHosts],
+      update: this.update,
     };
     this.listeners.forEach(fn => fn(d));
   }
@@ -88,6 +90,9 @@ class WarpManager {
 
     // Load split-tunnel hosts (best-effort; empty when WARP not running)
     try { const s = await window.vpn.splitList(); if (s?.hosts) this.splitHosts = s.hosts; } catch {}
+
+    // Check for updates in background — non-blocking
+    setTimeout(() => this._checkUpdate(), 8000);
 
     // Load autostart status
     try { const as = await window.vpn.autostartStatus(); this.autoStart = as.enabled || false; } catch {}
@@ -280,6 +285,29 @@ class WarpManager {
       this._n();
     }
     return r;
+  }
+
+  async _checkUpdate() {
+    if (!this._e) return;
+    try {
+      const r = await window.vpn.checkUpdate();
+      if (r?.available) {
+        this.update = { latest: r.latest, current: r.current, url: r.url };
+        this._log(`Update available: ${r.latest}`, 'success');
+        this._n();
+      }
+    } catch {}
+  }
+
+  openUpdate() {
+    if (this.update?.url && this._e) {
+      window.vpn.openExternal(this.update.url);
+    }
+  }
+
+  dismissUpdate() {
+    this.update = null;
+    this._n();
   }
 
   async _ip() { if (!this._e) return; try { this.stats.publicIp = await window.vpn.getPublicIp(); } catch {} }

@@ -34,6 +34,7 @@ const i18n = {
     dnsOffDesc: 'No filtering', dnsMalwareDesc: 'Block malware & phishing', dnsFullDesc: 'Block malware, phishing & adult sites',
     splitTunnel: 'Split Tunneling', splitTunnelDesc: 'Domains that bypass the VPN',
     addDomain: 'Add domain (e.g. bank.com)', add: 'Add', emptyHosts: 'No bypass rules',
+    updateAvail: 'Update available', updateDownload: 'Download',
   },
   ru: {
     title: 'Phantom', titleSuffix: 'VPN',
@@ -59,6 +60,7 @@ const i18n = {
     dnsOffDesc: 'Без фильтрации', dnsMalwareDesc: 'Блок малвари и фишинга', dnsFullDesc: 'Блок малвари, фишинга и 18+',
     splitTunnel: 'Split-туннелирование', splitTunnelDesc: 'Домены, идущие в обход VPN',
     addDomain: 'Добавить домен (напр. bank.by)', add: 'Добавить', emptyHosts: 'Нет исключений',
+    updateAvail: 'Доступно обновление', updateDownload: 'Скачать',
   },
 };
 
@@ -280,6 +282,36 @@ const Logs = memo(function Logs({ logs, t }) {
 function Sep() {
   return <div className="h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent my-2" />;
 }
+
+/* ==================== UPDATE BANNER ==================== */
+const UpdateBanner = memo(function UpdateBanner({ update, onDownload, onDismiss, t }) {
+  if (!update) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+      transition={spring}
+      className="fixed top-9 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl
+        bg-white/[0.06] backdrop-blur-xl border border-white/[0.12]
+        shadow-[0_10px_40px_rgba(0,0,0,0.55)]">
+      <Download size={14} strokeWidth={1.5} className="text-white/55" />
+      <div className="flex flex-col">
+        <p className="text-[10px] text-white/40 tracking-wider uppercase">{t.updateAvail}</p>
+        <p className="text-[11px] text-white/65 font-mono">{update.latest}</p>
+      </div>
+      <button onClick={onDownload}
+        className="ml-2 px-3 py-1.5 rounded-lg bg-white/[0.08] border border-white/[0.12]
+          hover:bg-white/[0.14] hover:border-white/[0.2] text-white/70 text-[10px] tracking-wider uppercase
+          transition-colors">
+        {t.updateDownload}
+      </button>
+      <button onClick={onDismiss}
+        className="w-6 h-6 rounded-md hover:bg-white/[0.05] flex items-center justify-center
+          text-white/25 hover:text-white/55 transition-colors">
+        <X size={12} strokeWidth={1.5} />
+      </button>
+    </motion.div>
+  );
+});
 
 /* ==================== DNS FILTER ==================== */
 const DnsFilter = memo(function DnsFilter({ mode, onChange, t }) {
@@ -514,6 +546,14 @@ export default function App() {
   return (
     <div className="relative min-h-screen">
       <div className="bg-scene" />
+
+      <AnimatePresence>
+        {state.update && (
+          <UpdateBanner update={state.update}
+            onDownload={() => warpManager.openUpdate()}
+            onDismiss={() => warpManager.dismissUpdate()} t={t} />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {page === 'settings' ? (

@@ -39,6 +39,10 @@ contextBridge.exposeInMainWorld('vpn', {
   splitAdd:        (host) => ipcRenderer.invoke('split-add', host),
   splitRemove:     (host) => ipcRenderer.invoke('split-remove', host),
 
+  // Update checker
+  checkUpdate:     () => ipcRenderer.invoke('check-update'),
+  openExternal:    (url) => ipcRenderer.invoke('open-external', url),
+
   // Events
   onLog:           (cb) => ipcRenderer.on('warp-log', (_, d) => cb(d)),
   onStatusUpdate:  (cb) => ipcRenderer.on('warp-status-update', (_, d) => cb(d)),

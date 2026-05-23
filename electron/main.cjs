@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -217,6 +217,52 @@ async function suppressWarpNotifications() {
 ipcMain.handle('suppress-notifications', async () => {
   suppressWarpNotifications(); // fire-and-forget
   return { success: true };
+});
+
+// ==========================================
+// UPDATE CHECK (lightweight, no auto-install)
+// ==========================================
+// Polls GitHub Releases API; if a newer tag exists, returns it.
+// UI shows a non-blocking banner; user clicks to open the release page.
+
+function cmpSemver(a, b) {
+  const pa = a.replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const pb = b.replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+    if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+  }
+  return 0;
+}
+
+ipcMain.handle('open-external', async (_, url) => {
+  // Only open https GitHub URLs to prevent abuse
+  if (typeof url === 'string' && /^https:\/\/github\.com\/XXxilusha\/phantom-vpn(\/|$)/i.test(url)) {
+    shell.openExternal(url);
+    return { success: true };
+  }
+  return { success: false, error: 'blocked url' };
+});
+
+ipcMain.handle('check-update', async () => {
+  try {
+    const raw = await fetchText('https://api.github.com/repos/XXxilusha/phantom-vpn/releases/latest');
+    const data = JSON.parse(raw);
+    const latest = data.tag_name || '';
+    const current = app.getVersion();
+    if (!latest) return { available: false, current };
+    const newer = cmpSemver(latest, current) > 0;
+    return {
+      available: newer,
+      current,
+      latest,
+      url: data.html_url || `https://github.com/XXxilusha/phantom-vpn/releases/tag/${latest}`,
+      name: data.name || latest,
+      notes: data.body || '',
+    };
+  } catch (err) {
+    return { available: false, error: err.message };
+  }
 });
 
 // ==========================================
