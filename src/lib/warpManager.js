@@ -9,6 +9,8 @@ class WarpManager {
     this.killSwitch = false;
     this.autoConnect = false;
     this.autoStart = false;
+    this.familiesMode = 'off'; // 'off' | 'malware' | 'full'
+    this.splitHosts = [];
     this.stats = {
       ping: 0, downloadSpeed: -1, uploadSpeed: -1,
       totalDownload: 0, totalUpload: 0,
@@ -59,6 +61,8 @@ class WarpManager {
       killSwitch: this.killSwitch,
       autoConnect: this.autoConnect,
       autoStart: this.autoStart,
+      familiesMode: this.familiesMode,
+      splitHosts: [...this.splitHosts],
     };
     this.listeners.forEach(fn => fn(d));
   }
@@ -79,7 +83,11 @@ class WarpManager {
     if (r.settings) {
       this.killSwitch = r.settings.killSwitch || false;
       this.autoConnect = r.settings.autoConnect || false;
+      this.familiesMode = r.settings.familiesMode || 'off';
     }
+
+    // Load split-tunnel hosts (best-effort; empty when WARP not running)
+    try { const s = await window.vpn.splitList(); if (s?.hosts) this.splitHosts = s.hosts; } catch {}
 
     // Load autostart status
     try { const as = await window.vpn.autostartStatus(); this.autoStart = as.enabled || false; } catch {}
@@ -232,6 +240,46 @@ class WarpManager {
       }
     } catch { this.autoStart = false; }
     this._n();
+  }
+
+  async setFamiliesMode(mode) {
+    if (!this._e) return;
+    const prev = this.familiesMode;
+    this.familiesMode = mode;
+    this._n();
+    try {
+      const r = await window.vpn.dnsFamiliesSet(mode);
+      if (!r?.success) {
+        this.familiesMode = prev;
+        this._log(`DNS filter failed: ${r?.error || 'unknown'}`, 'error');
+        this._n();
+      }
+    } catch (e) {
+      this.familiesMode = prev;
+      this._n();
+    }
+  }
+
+  async addSplitHost(host) {
+    if (!this._e || !host) return { success: false };
+    const r = await window.vpn.splitAdd(host);
+    if (r?.success) {
+      if (!this.splitHosts.includes(r.host)) this.splitHosts = [...this.splitHosts, r.host];
+      this._n();
+    } else {
+      this._log(`Bypass failed: ${r?.error || 'invalid host'}`, 'error');
+    }
+    return r;
+  }
+
+  async removeSplitHost(host) {
+    if (!this._e || !host) return;
+    const r = await window.vpn.splitRemove(host);
+    if (r?.success) {
+      this.splitHosts = this.splitHosts.filter(h => h !== r.host);
+      this._n();
+    }
+    return r;
   }
 
   async _ip() { if (!this._e) return; try { this.stats.publicIp = await window.vpn.getPublicIp(); } catch {} }

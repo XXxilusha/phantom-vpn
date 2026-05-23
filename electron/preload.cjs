@@ -30,6 +30,15 @@ contextBridge.exposeInMainWorld('vpn', {
   // Suppress WARP notifications
   suppressNotifs:  () => ipcRenderer.invoke('suppress-notifications'),
 
+  // DNS Family Mode (block ads/malware/adult content at DNS level)
+  dnsFamiliesGet:  () => ipcRenderer.invoke('dns-families-get'),
+  dnsFamiliesSet:  (mode) => ipcRenderer.invoke('dns-families-set', mode),
+
+  // Split Tunneling (per-host bypass list)
+  splitList:       () => ipcRenderer.invoke('split-list'),
+  splitAdd:        (host) => ipcRenderer.invoke('split-add', host),
+  splitRemove:     (host) => ipcRenderer.invoke('split-remove', host),
+
   // Events
   onLog:           (cb) => ipcRenderer.on('warp-log', (_, d) => cb(d)),
   onStatusUpdate:  (cb) => ipcRenderer.on('warp-status-update', (_, d) => cb(d)),

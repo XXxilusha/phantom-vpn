@@ -79,7 +79,7 @@ function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function loadSettings() {
   try { if (fs.existsSync(SETTINGS_FILE)) return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')); } catch {}
-  return { killSwitch: false, autoConnect: false };
+  return { killSwitch: false, autoConnect: false, familiesMode: 'off' };
 }
 function saveSettings(data) {
   try { fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2)); } catch {}
@@ -89,6 +89,89 @@ ipcMain.handle('settings-get', async () => loadSettings());
 ipcMain.handle('settings-set', async (_, patch) => {
   saveSettings({ ...loadSettings(), ...patch });
   return { success: true };
+});
+
+// ==========================================
+// DNS FAMILY MODE (block ads / malware / adult)
+// ==========================================
+// Modes: 'off' (none), 'malware' (1.1.1.2 — blocks malware),
+//        'full' (1.1.1.3 — blocks malware + adult content)
+
+const VALID_FAMILIES = new Set(['off', 'malware', 'full']);
+
+ipcMain.handle('dns-families-get', async () => {
+  const s = loadSettings();
+  return { mode: VALID_FAMILIES.has(s.familiesMode) ? s.familiesMode : 'off' };
+});
+
+ipcMain.handle('dns-families-set', async (_, mode) => {
+  if (!VALID_FAMILIES.has(mode)) return { success: false, error: 'invalid mode' };
+  try {
+    // New warp-cli syntax: `warp-cli dns families <mode>`.
+    // Fall back to legacy `set-families-mode` if first form fails.
+    try { await run(`"${WARP_CLI}" dns families ${mode}`, 5000); }
+    catch { await run(`"${WARP_CLI}" set-families-mode ${mode}`, 5000); }
+
+    saveSettings({ ...loadSettings(), familiesMode: mode });
+    const label = mode === 'off' ? 'disabled' : mode === 'malware' ? 'Malware block' : 'Malware + Adult block';
+    sendLog(`DNS filter: ${label}`, mode === 'off' ? 'info' : 'success');
+    return { success: true, mode };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// ==========================================
+// SPLIT TUNNELING (per-host bypass list)
+// ==========================================
+// Hosts in the list bypass the VPN — useful for banking sites,
+// local IoT, region-locked services that block VPN, etc.
+
+// Strict host validator: DNS name or IPv4. Prevents shell injection.
+const HOST_RX = /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+|(?:\d{1,3}\.){3}\d{1,3})$/i;
+
+function sanitizeHost(host) {
+  if (typeof host !== 'string') return null;
+  const h = host.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  return HOST_RX.test(h) ? h : null;
+}
+
+ipcMain.handle('split-list', async () => {
+  try {
+    const raw = await run(`"${WARP_CLI}" tunnel host list`, 5000);
+    const hosts = raw.split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && !/^-+$/.test(l) && !/host\s*list/i.test(l) && !/^no\s/i.test(l))
+      .map(l => l.replace(/^[-*•]\s*/, ''))
+      .filter(l => HOST_RX.test(l));
+    return { hosts: [...new Set(hosts)] };
+  } catch {
+    return { hosts: [] };
+  }
+});
+
+ipcMain.handle('split-add', async (_, host) => {
+  const h = sanitizeHost(host);
+  if (!h) return { success: false, error: 'invalid host' };
+  try {
+    await run(`"${WARP_CLI}" tunnel host add ${h}`, 5000);
+    sendLog(`Bypass: ${h}`, 'success');
+    return { success: true, host: h };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('split-remove', async (_, host) => {
+  const h = sanitizeHost(host);
+  if (!h) return { success: false, error: 'invalid host' };
+  try {
+    await run(`"${WARP_CLI}" tunnel host remove ${h}`, 5000);
+    sendLog(`Bypass removed: ${h}`, 'info');
+    return { success: true, host: h };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 });
 
 // ==========================================
@@ -215,6 +298,13 @@ ipcMain.handle('warp-connect', async () => {
 
     // WARP+DoH for best performance
     try { await run(`"${WARP_CLI}" mode warp+doh`, 5000); } catch {}
+
+    // Re-apply DNS Families mode (survives WARP restarts)
+    const familiesMode = loadSettings().familiesMode;
+    if (familiesMode && VALID_FAMILIES.has(familiesMode) && familiesMode !== 'off') {
+      try { await run(`"${WARP_CLI}" dns families ${familiesMode}`, 4000); }
+      catch { try { await run(`"${WARP_CLI}" set-families-mode ${familiesMode}`, 4000); } catch {} }
+    }
 
     // Connect
     try { await run(`"${WARP_CLI}" connect`, 20000); } catch {}

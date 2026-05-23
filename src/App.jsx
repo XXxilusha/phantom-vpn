@@ -4,7 +4,7 @@ import {
   Shield, Power, ArrowDown, ArrowUp, Zap, Clock,
   Download, Upload, MapPin, Loader, Lock, Unlock,
   Globe, Settings, ArrowLeft, Atom, AlertTriangle,
-  RefreshCw, Wifi, MonitorCheck,
+  RefreshCw, Wifi, MonitorCheck, Filter, GitBranch, X, Plus,
 } from 'lucide-react';
 import { warpManager } from './lib/warpManager';
 
@@ -29,6 +29,11 @@ const i18n = {
     autoConnect: 'Auto-Connect', autoConnectDesc: 'Connect on app start',
     autoStart: 'Start with Windows', autoStartDesc: 'Launch app at startup',
     log: 'Activity Log', noActivity: 'No activity',
+    dnsFilter: 'DNS Filter', dnsFilterDesc: 'Block threats at DNS level',
+    dnsOff: 'Off', dnsMalware: 'Malware', dnsFull: 'Malware + Adult',
+    dnsOffDesc: 'No filtering', dnsMalwareDesc: 'Block malware & phishing', dnsFullDesc: 'Block malware, phishing & adult sites',
+    splitTunnel: 'Split Tunneling', splitTunnelDesc: 'Domains that bypass the VPN',
+    addDomain: 'Add domain (e.g. bank.com)', add: 'Add', emptyHosts: 'No bypass rules',
   },
   ru: {
     title: 'Phantom', titleSuffix: 'VPN',
@@ -49,6 +54,11 @@ const i18n = {
     autoConnect: 'Авто-подключение', autoConnectDesc: 'Подключать при запуске приложения',
     autoStart: 'Автозапуск', autoStartDesc: 'Запускать приложение вместе с Windows',
     log: 'Журнал', noActivity: 'Нет активности',
+    dnsFilter: 'DNS-фильтр', dnsFilterDesc: 'Блокировка угроз на уровне DNS',
+    dnsOff: 'Выкл', dnsMalware: 'Угрозы', dnsFull: 'Угрозы + 18+',
+    dnsOffDesc: 'Без фильтрации', dnsMalwareDesc: 'Блок малвари и фишинга', dnsFullDesc: 'Блок малвари, фишинга и 18+',
+    splitTunnel: 'Split-туннелирование', splitTunnelDesc: 'Домены, идущие в обход VPN',
+    addDomain: 'Добавить домен (напр. bank.by)', add: 'Добавить', emptyHosts: 'Нет исключений',
   },
 };
 
@@ -271,6 +281,115 @@ function Sep() {
   return <div className="h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent my-2" />;
 }
 
+/* ==================== DNS FILTER ==================== */
+const DnsFilter = memo(function DnsFilter({ mode, onChange, t }) {
+  const opts = [
+    { v: 'off',     label: t.dnsOff,     desc: t.dnsOffDesc },
+    { v: 'malware', label: t.dnsMalware, desc: t.dnsMalwareDesc },
+    { v: 'full',    label: t.dnsFull,    desc: t.dnsFullDesc },
+  ];
+  return (
+    <div className="py-3.5">
+      <div className="flex items-center gap-3 mb-3">
+        <Filter size={15} strokeWidth={1.3} className="text-white/20 shrink-0" />
+        <div>
+          <p className="text-[12px] text-white/35">{t.dnsFilter}</p>
+          <p className="text-[9px] text-white/12 mt-0.5">{t.dnsFilterDesc}</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-1.5">
+        {opts.map(o => {
+          const active = mode === o.v;
+          return (
+            <motion.button key={o.v} onClick={() => onChange(o.v)}
+              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={spring}
+              className={`px-2 py-2.5 rounded-xl text-center transition-all duration-400
+                ${active
+                  ? 'bg-white/[0.07] border border-white/[0.09]'
+                  : 'bg-white/[0.015] border border-white/[0.025] hover:border-white/[0.06]'}`}>
+              <p className={`text-[10px] font-medium tracking-wider uppercase ${active ? 'text-white/45' : 'text-white/20'}`}>
+                {o.label}
+              </p>
+              <p className={`text-[8px] mt-1 ${active ? 'text-white/25' : 'text-white/12'}`}>
+                {o.desc}
+              </p>
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+/* ==================== SPLIT TUNNELING ==================== */
+const SplitTunnel = memo(function SplitTunnel({ hosts, onAdd, onRemove, t }) {
+  const [input, setInput] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    const v = input.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    if (!v) return;
+    setBusy(true); setErr('');
+    const r = await onAdd(v);
+    setBusy(false);
+    if (r?.success) setInput('');
+    else setErr(r?.error || 'invalid');
+  };
+
+  return (
+    <div className="py-3.5">
+      <div className="flex items-center gap-3 mb-3">
+        <GitBranch size={15} strokeWidth={1.3} className="text-white/20 shrink-0" />
+        <div>
+          <p className="text-[12px] text-white/35">{t.splitTunnel}</p>
+          <p className="text-[9px] text-white/12 mt-0.5">{t.splitTunnelDesc}</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-3">
+        <input value={input}
+          onChange={e => { setInput(e.target.value); setErr(''); }}
+          onKeyDown={e => { if (e.key === 'Enter') submit(); }}
+          placeholder={t.addDomain}
+          className={`flex-1 px-3 py-2 rounded-lg bg-white/[0.02] border text-[11px] text-white/55
+            placeholder:text-white/15 outline-none transition-colors
+            ${err ? 'border-red-400/30' : 'border-white/[0.04] focus:border-white/[0.1]'}`} />
+        <motion.button onClick={submit} disabled={busy || !input.trim()}
+          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={spring}
+          className="px-3 rounded-lg bg-white/[0.04] border border-white/[0.06]
+            hover:border-white/[0.12] text-white/40 disabled:opacity-30 disabled:cursor-not-allowed
+            transition-colors flex items-center justify-center">
+          <Plus size={14} strokeWidth={1.5} />
+        </motion.button>
+      </div>
+
+      <div className="max-h-44 overflow-y-auto space-y-1.5">
+        {hosts.length === 0 && (
+          <p className="text-[10px] text-white/10 py-1">{t.emptyHosts}</p>
+        )}
+        <AnimatePresence initial={false}>
+          {hosts.map(h => (
+            <motion.div key={h}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white/[0.015] border border-white/[0.03]">
+              <span className="text-[11px] text-white/40 font-mono truncate">{h}</span>
+              <button onClick={() => onRemove(h)}
+                className="shrink-0 w-6 h-6 rounded-md hover:bg-white/[0.05] flex items-center justify-center
+                  text-white/25 hover:text-white/55 transition-colors">
+                <X size={12} strokeWidth={1.5} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+});
+
 /* ==================== SETTINGS PAGE ==================== */
 function SettingsPage({ state, lang, setLang, t, onBack }) {
   return (
@@ -326,6 +445,19 @@ function SettingsPage({ state, lang, setLang, t, onBack }) {
 
         <Sep />
 
+        {/* DNS Family Filter */}
+        <DnsFilter mode={state.familiesMode}
+          onChange={(m) => warpManager.setFamiliesMode(m)} t={t} />
+
+        <Sep />
+
+        {/* Split Tunneling */}
+        <SplitTunnel hosts={state.splitHosts}
+          onAdd={(h) => warpManager.addSplitHost(h)}
+          onRemove={(h) => warpManager.removeSplitHost(h)} t={t} />
+
+        <Sep />
+
         <Logs logs={state.logs} t={t} />
       </div>
     </motion.div>
@@ -339,6 +471,7 @@ export default function App() {
     isElectron: false, warpInstalled: false,
     staticIp: { enabled: false }, ipInfo: {},
     killSwitch: false, autoConnect: false, autoStart: false,
+    familiesMode: 'off', splitHosts: [],
   });
   const [elapsed, setElapsed] = useState('00:00:00');
   const [page, setPage] = useState('main');
