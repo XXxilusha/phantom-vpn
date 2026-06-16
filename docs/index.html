@@ -140,7 +140,7 @@
         "name": "Работает ли Phantom VPN в Беларуси и России?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Да, работает. Приложение использует сеть Cloudflare WARP с протоколом MASQUE поверх HTTPS, который сложно отличить от обычного веб-трафика, поэтому стабильно работает в Беларуси, России и других странах с ограничениями."
+          "text": "Да, работает везде, включая Россию. Бесплатный режим автоматически выбирает оптимальный протокол: WARP в странах без блокировок и собственный VLESS-канал в России (маскируется под обычный HTTPS, проходит DPI). Pro отличается возможностью одновременно подключать до 5 устройств, ручным выбором локации и приоритетом на серверах — от 149 ₽/мес через Telegram-бот @phantomvpnby_bot."
         }
       },
       {
@@ -578,6 +578,76 @@
       color:rgba(255,255,255,.30); padding:8px 18px;
       border:1px solid rgba(255,255,255,.08); border-radius:100px;
       background:rgba(3,3,4,.48); backdrop-filter:blur(12px);
+    }
+
+    /* ── PRO TIER (Telegram bot upsell, monochrome to match site) ── */
+    #pro { padding:120px 48px; max-width:1100px; margin:0 auto; position:relative; }
+    .pro-head { text-align:center; max-width:760px; margin:0 auto 48px; }
+    .pro-title { font-size:42px; line-height:1.1; letter-spacing:-.02em; color:rgba(255,255,255,.92); font-weight:300; margin:14px 0 18px; }
+    .pro-title em { font-style:normal; color:rgba(255,255,255,1); font-weight:500; border-bottom:1px solid rgba(255,255,255,.18); padding-bottom:2px; }
+    .pro-sub { font-size:15px; line-height:1.65; color:rgba(255,255,255,.42); margin:0; }
+    .pro-sub strong { color:rgba(255,255,255,.78); font-weight:500; }
+
+    .pro-cmp { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:0 auto 38px; max-width:920px; }
+    .pro-card { padding:32px 28px; border-radius:20px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.05); transition:border-color .55s, background .55s, transform .55s; }
+    .pro-card:hover { background:rgba(255,255,255,.035); border-color:rgba(255,255,255,.1); transform:translateY(-2px); }
+    .pro-card.is-pro { background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.12); box-shadow:0 30px 80px -20px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05); }
+    .pro-card-label { font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.3); margin-bottom:10px; }
+    .pro-card.is-pro .pro-card-label { color:rgba(255,255,255,.55); }
+    .pro-card-name { font-size:24px; color:rgba(255,255,255,.95); margin:0 0 6px; font-weight:400; letter-spacing:-.01em; }
+    .pro-card-price { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:22px; letter-spacing:.04em; }
+    .pro-card-price strong { color:rgba(255,255,255,.88); font-weight:500; letter-spacing:0; }
+    .pro-feat { display:flex; align-items:center; gap:11px; padding:8px 0; font-size:13px; color:rgba(255,255,255,.58); }
+    .pro-feat svg { width:14px; height:14px; flex-shrink:0; stroke-width:1.8; }
+    .pro-feat.is-on svg { stroke:rgba(255,255,255,.7); }
+    .pro-feat.is-off { color:rgba(255,255,255,.22); }
+    .pro-feat.is-off svg { stroke:rgba(255,255,255,.18); }
+
+    .pro-cta-wrap { text-align:center; }
+    .pro-cta {
+      display:inline-flex; align-items:center; gap:13px;
+      font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(255,255,255,.85); text-decoration:none;
+      padding:18px 48px; border-radius:100px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      transition:background .45s, border-color .45s, color .45s, box-shadow .45s, transform .35s;
+    }
+    .pro-cta:hover { background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.24); color:rgba(255,255,255,1); transform:translateY(-2px); box-shadow:0 22px 60px rgba(0,0,0,.55), 0 0 60px rgba(255,255,255,.05); }
+    .pro-cta svg { width:18px; height:18px; fill:currentColor; }
+    .pro-hint { margin-top:16px; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); }
+
+    /* ── NEWS / CHANGELOG (monochrome) ── */
+    #news { padding:80px 48px 120px; max-width:880px; margin:0 auto; }
+    .news-head { text-align:center; margin-bottom:48px; }
+    .news-title { font-size:38px; line-height:1.1; letter-spacing:-.02em; color:rgba(255,255,255,.92); font-weight:300; margin:14px 0 12px; }
+    .news-title em { font-style:normal; color:rgba(255,255,255,1); font-weight:500; border-bottom:1px solid rgba(255,255,255,.18); padding-bottom:2px; }
+    .news-sub { font-size:14px; color:rgba(255,255,255,.4); margin:0; }
+    .news-list { display:flex; flex-direction:column; gap:18px; }
+    .news-item { padding:26px 28px; border-radius:18px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.05); transition:border-color .5s, background .5s, transform .5s; }
+    .news-item:hover { background:rgba(255,255,255,.035); border-color:rgba(255,255,255,.1); transform:translateY(-2px); }
+    .news-meta { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+    .news-ver { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.65); padding:4px 12px; border:1px solid rgba(255,255,255,.12); border-radius:100px; background:rgba(255,255,255,.04); }
+    .news-date { font-size:11px; color:rgba(255,255,255,.3); letter-spacing:.1em; }
+    .news-tag { font-size:9px; letter-spacing:.22em; text-transform:uppercase; padding:3px 10px; border-radius:100px; color:rgba(255,255,255,.45); background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.06); }
+    .news-tag.t-feature::before { content:'+ '; }
+    .news-tag.t-fix::before     { content:'~ '; }
+    .news-tag.t-info::before    { content:'• '; }
+    .news-h { font-size:18px; color:rgba(255,255,255,.9); margin:0 0 8px; font-weight:400; letter-spacing:-.005em; }
+    .news-body { font-size:14px; line-height:1.65; color:rgba(255,255,255,.55); }
+    .news-body a { color:rgba(255,255,255,.8); text-decoration:none; border-bottom:1px solid rgba(255,255,255,.2); }
+    .news-body a:hover { color:rgba(255,255,255,1); border-color:rgba(255,255,255,.5); }
+    .news-body ul { margin:8px 0 0; padding-left:18px; }
+    .news-body li { margin:4px 0; }
+    .news-empty { text-align:center; color:rgba(255,255,255,.25); font-size:13px; padding:40px 0; }
+
+    @media (max-width:720px) {
+      #pro { padding:80px 22px; }
+      .pro-title { font-size:30px; }
+      .pro-cmp { grid-template-columns:1fr; }
+      #news { padding:40px 22px 80px; }
+      .news-title { font-size:26px; }
+      .news-item { padding:22px 20px; }
     }
 
     /* ── INSTALL GUIDE ── */
@@ -1150,6 +1220,8 @@
   <ul class="nav-links">
     <li><a href="#features">Функции</a></li>
     <li><a href="#how">Как работает</a></li>
+    <li><a href="#pro">Pro</a></li>
+    <li><a href="#news">Новости</a></li>
     <li><a href="#download">Скачать</a></li>
   </ul>
 </nav>
@@ -1323,6 +1395,50 @@
   </div>
 </section>
 
+<!-- ════════════════════ FREE vs PRO ════════════════════ -->
+<section id="pro">
+  <div class="pro-head">
+    <div class="sec-tag" style="margin-bottom:0">Тарифы</div>
+    <h2 class="pro-title">Один VPN — <em>два режима</em></h2>
+    <p class="pro-sub">
+      Phantom работает в России и везде. <strong>Free</strong> бесплатный навсегда, для одного устройства.
+      <strong>Pro</strong> снимает лимиты: больше устройств, выбор локации, приоритет на серверах.
+      Без аккаунта, без карты — только Telegram и крипта.
+    </p>
+  </div>
+
+  <div class="pro-cmp">
+    <div class="pro-card">
+      <div class="pro-card-label">Free</div>
+      <h3 class="pro-card-name">Phantom Free</h3>
+      <div class="pro-card-price"><strong>0&nbsp;₽</strong> · навсегда</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Работает в России и везде</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>1 устройство</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Автовыбор локации</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Без аккаунта и без Telegram</div>
+      <div class="pro-feat is-off"><svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Без выбора локации, без приоритета</div>
+    </div>
+    <div class="pro-card is-pro">
+      <div class="pro-card-label">Pro · Рекомендуем</div>
+      <h3 class="pro-card-name">Phantom Pro</h3>
+      <div class="pro-card-price">от <strong>149&nbsp;₽/мес</strong> · или 1.7&nbsp;USDT</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>До 5 устройств одновременно</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Ручной выбор локации</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Приоритетный канал — выше скорость</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>Оплата USDT / TON / BTC через @CryptoBot</div>
+      <div class="pro-feat is-on"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>3 дня триала бесплатно</div>
+    </div>
+  </div>
+
+  <div class="pro-cta-wrap">
+    <a href="https://t.me/phantomvpnby_bot" class="pro-cta magnetic" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+      Перейти на Pro в Telegram
+    </a>
+    <p class="pro-hint">@phantomvpnby_bot · 3 дня триала бесплатно</p>
+  </div>
+</section>
+
 <!-- Install guide -->
 <section id="install">
   <div class="install-grid">
@@ -1346,6 +1462,18 @@
       <div class="install-title">Настройте под себя</div>
       <div class="install-desc">Включите Kill Switch, постквантовый режим, автоподключение и закрепление сервера в настройках.</div>
     </div>
+  </div>
+</section>
+
+<!-- ════════════════════ NEWS / CHANGELOG ════════════════════ -->
+<section id="news">
+  <div class="news-head">
+    <div class="sec-tag" style="margin-bottom:0">Журнал обновлений</div>
+    <h2 class="news-title">Что <em>нового</em></h2>
+    <p class="news-sub">Последние обновления, фиксы и фичи Phantom VPN</p>
+  </div>
+  <div class="news-list" id="news-list">
+    <div class="news-empty">Загружаем последние новости…</div>
   </div>
 </section>
 
@@ -1393,7 +1521,7 @@
         <span>Работает ли в Беларуси и России?</span>
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <div class="faq-a">Да. Phantom VPN использует протокол MASQUE поверх HTTPS — трафик неотличим от обычного веб-трафика, что обеспечивает стабильную работу в Беларуси, России и других регионах с ограничениями. Для смены IP можно использовать функцию закрепления endpoint'а.</div>
+      <div class="faq-a">Да, работает везде включая Россию. Бесплатный режим автоматически выбирает протокол: WARP в странах без блокировок и собственный VLESS-канал в России (маскируется под обычный HTTPS, проходит DPI РКН). <strong>Phantom Pro</strong> отличается возможностью подключать до 5 устройств одновременно, ручным выбором локации и приоритетом на серверах. Подписка от 149 ₽/мес через <a href="https://t.me/phantomvpnby_bot">Telegram-бот @phantomvpnby_bot</a>, оплата криптой, 3 дня триала бесплатно.</div>
     </div>
 
     <div class="faq-item">
@@ -1733,6 +1861,33 @@ window.addEventListener('scroll', () => {
   /* install */
   gsap.from('.install-card',{ opacity:0, y:22, stagger:.1, duration:.7, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'#install', start:'top 86%' }});
 
+  /* pro */
+  gsap.from('#pro .sec-tag',     { opacity:0, y:14, duration:.6, ease, scrollTrigger:{ trigger:'#pro', start:'top 86%' }});
+  gsap.from('#pro .pro-title',   { opacity:0, y:22, duration:.7, ease, delay:.1,  scrollTrigger:{ trigger:'#pro', start:'top 86%' }});
+  gsap.from('#pro .pro-sub',     { opacity:0, y:16, duration:.6, ease, delay:.22, scrollTrigger:{ trigger:'#pro', start:'top 86%' }});
+  gsap.from('#pro .pro-card',    { opacity:0, y:28, stagger:.12, duration:.75, ease:'power3.out', clearProps:'transform', scrollTrigger:{ trigger:'.pro-cmp', start:'top 86%' }});
+  gsap.from('#pro .pro-feat',    { opacity:0, x:-12, stagger:.04, duration:.45, ease, scrollTrigger:{ trigger:'.pro-cmp', start:'top 84%' }});
+  gsap.from('#pro .pro-cta-wrap',{ opacity:0, y:18, scale:.96, duration:.7, ease:'back.out(1.4)', clearProps:'transform', scrollTrigger:{ trigger:'#pro .pro-cta-wrap', start:'top 92%' }});
+
+  /* news */
+  gsap.from('#news .sec-tag',    { opacity:0, y:14, duration:.6, ease, scrollTrigger:{ trigger:'#news', start:'top 88%' }});
+  gsap.from('#news .news-title', { opacity:0, y:22, duration:.7, ease, delay:.1,  scrollTrigger:{ trigger:'#news', start:'top 88%' }});
+  gsap.from('#news .news-sub',   { opacity:0, y:14, duration:.6, ease, delay:.2,  scrollTrigger:{ trigger:'#news', start:'top 88%' }});
+  // news-item появляются по мере добавления — оборачиваем в MutationObserver
+  (function animateNewsItems() {
+    const list = document.getElementById('news-list');
+    if (!list) return;
+    const obs = new MutationObserver(() => {
+      gsap.from(list.querySelectorAll('.news-item'), {
+        opacity:0, y:24, stagger:.08, duration:.65, ease:'power3.out',
+        clearProps:'transform',
+        scrollTrigger:{ trigger:'#news-list', start:'top 92%' },
+      });
+      obs.disconnect();
+    });
+    obs.observe(list, { childList:true });
+  })();
+
   /* footer */
   gsap.from('footer > *',{ opacity:0, y:18, stagger:.13, duration:.65, ease, clearProps:'transform', scrollTrigger:{ trigger:'footer', start:'top 92%' }});
 
@@ -1795,6 +1950,44 @@ qsa('.tilt').forEach(card => {
     card.style.transition='transform .5s ease, background .4s';
   });
 });
+
+/* ── NEWS RENDERER ── */
+(async () => {
+  const list = document.getElementById('news-list');
+  if (!list) return;
+  try {
+    const res = await fetch('./news.json?v=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('http ' + res.status);
+    const items = await res.json();
+    if (!Array.isArray(items) || items.length === 0) {
+      list.innerHTML = '<div class="news-empty">Пока новостей нет — следите за обновлениями.</div>';
+      return;
+    }
+    list.innerHTML = items.map((n) => {
+      const tagClass = n.tag === 'fix' ? 't-fix' : n.tag === 'info' ? 't-info' : 't-feature';
+      const tagLabel = n.tag === 'fix' ? 'Фикс' : n.tag === 'info' ? 'Инфо' : 'Фича';
+      const date = n.date ? new Date(n.date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+      return `
+        <article class="news-item">
+          <div class="news-meta">
+            ${n.version ? `<span class="news-ver">v${escapeHtml(n.version)}</span>` : ''}
+            <span class="news-tag ${tagClass}">${tagLabel}</span>
+            ${date ? `<span class="news-date">${escapeHtml(date)}</span>` : ''}
+          </div>
+          ${n.title ? `<h3 class="news-h">${escapeHtml(n.title)}</h3>` : ''}
+          ${n.body ? `<div class="news-body">${n.body}</div>` : ''}
+        </article>
+      `;
+    }).join('');
+  } catch (e) {
+    console.error('news load failed', e);
+    list.innerHTML = '<div class="news-empty">Не удалось загрузить новости. Попробуйте позже.</div>';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+})();
 </script>
 </body>
 </html>

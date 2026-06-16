@@ -7,6 +7,7 @@ import {
   RefreshCw, Wifi, MonitorCheck, Filter, GitBranch, X, Plus,
 } from 'lucide-react';
 import { warpManager } from './lib/warpManager';
+import ProMode from './components/ProMode';
 
 /* ---- i18n ---- */
 const i18n = {
@@ -422,6 +423,40 @@ const SplitTunnel = memo(function SplitTunnel({ hosts, onAdd, onRemove, t }) {
   );
 });
 
+/* ==================== MODE SWITCHER (FREE / PRO) ==================== */
+const ModeSwitcher = memo(function ModeSwitcher({ mode, setMode }) {
+  return (
+    <div className="flex items-center justify-center mb-4">
+      <div className="relative flex items-center bg-white/[0.02] border border-white/[0.04] rounded-full p-1">
+        <motion.div
+          className="absolute top-1 bottom-1 rounded-full bg-white/[0.06] border border-white/[0.06]"
+          animate={{
+            left:  mode === 'free' ? 4 : '50%',
+            right: mode === 'free' ? '50%' : 4,
+          }}
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+        <button
+          onClick={() => setMode('free')}
+          className={`relative z-10 px-5 py-1.5 rounded-full text-[10px] tracking-[0.22em] uppercase font-medium transition-colors ${
+            mode === 'free' ? 'text-white/65' : 'text-white/25 hover:text-white/40'
+          }`}
+        >
+          Free
+        </button>
+        <button
+          onClick={() => setMode('pro')}
+          className={`relative z-10 px-5 py-1.5 rounded-full text-[10px] tracking-[0.22em] uppercase font-medium transition-colors ${
+            mode === 'pro' ? 'text-white/65' : 'text-white/25 hover:text-white/40'
+          }`}
+        >
+          Pro
+        </button>
+      </div>
+    </div>
+  );
+});
+
 /* ==================== SETTINGS PAGE ==================== */
 function SettingsPage({ state, lang, setLang, t, onBack }) {
   return (
@@ -510,6 +545,13 @@ export default function App() {
   const [lang, setLang] = useState(() => {
     try { return localStorage.getItem('phantom-lang') || 'en'; } catch { return 'en'; }
   });
+  const [mode, setMode] = useState(() => {
+    try { return localStorage.getItem('phantom-mode') || 'free'; } catch { return 'free'; }
+  });
+  const setModePersist = (m) => {
+    setMode(m);
+    try { localStorage.setItem('phantom-mode', m); } catch {}
+  };
   const timerRef = useRef(null);
   const t = i18n[lang];
 
@@ -591,9 +633,16 @@ export default function App() {
             </motion.div>
             <p className="text-[9px] text-white/10 tracking-[0.4em] uppercase font-gothic text-center mb-2">{t.subtitle}</p>
 
+            {/* FREE / PRO mode switcher */}
+            <ModeSwitcher mode={mode} setMode={setModePersist} />
+
             {/* Center Area */}
             <motion.div className="flex-1 flex flex-col items-center justify-center"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
+
+              {mode === 'pro' ? (
+                <ProMode t={t} />
+              ) : (<>
 
               <Status status={state.status} t={t} />
 
@@ -655,11 +704,12 @@ export default function App() {
                   {t.tapToEncrypt}
                 </motion.p>
               )}
+              </>)}
             </motion.div>
 
-            {/* Bottom Stats */}
+            {/* Bottom Stats (FREE only) */}
             <AnimatePresence>
-              {on && (
+              {mode === 'free' && on && (
                 <motion.div key="bottom" className="space-y-4 pb-2"
                   initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}>

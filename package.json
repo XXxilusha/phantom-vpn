@@ -1,7 +1,7 @@
 {
   "name": "phantom-vpn",
-  "version": "2.1.0",
-  "description": "Personal VPN with glassmorphism UI — zero config, powered by Cloudflare WARP",
+  "version": "3.0.0",
+  "description": "Phantom VPN — Free WARP + Pro VLESS channel via Telegram",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -9,6 +9,7 @@
     "build": "vite build",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "vite build && electron-builder",
+    "download-singbox": "powershell -ExecutionPolicy Bypass -File electron/scripts/download-singbox.ps1",
     "start": "vite --open"
   },
   "dependencies": {
@@ -51,6 +52,11 @@
       {
         "from": "public/bg.jpg",
         "to": "."
+      },
+      {
+        "from": "electron/bin",
+        "to": "bin",
+        "filter": ["**/*", "!.gitkeep"]
       }
     ]
   }

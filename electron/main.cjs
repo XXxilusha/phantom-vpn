@@ -4,6 +4,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
+const proManager = require('./proManager.cjs');
 
 const WARP_CLI = 'C:\\Program Files\\Cloudflare\\Cloudflare WARP\\warp-cli.exe';
 const WARP_MSI_URL = 'https://1111-releases.cloudflareclient.com/windows/Cloudflare_WARP_Release-x64.msi';
@@ -52,6 +53,7 @@ app.whenReady().then(() => {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   createWindow();
   suppressWarpNotifications(); // fire-and-forget on startup
+  ensureWarpDaemon();          // make sure the CloudflareWARP service is up
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (!mainWindow) createWindow(); });
@@ -204,6 +206,53 @@ ipcMain.handle('autostart-status', async () => {
 // SUPPRESS WARP NOTIFICATIONS
 // ==========================================
 
+// ==========================================
+// WARP DAEMON (Windows service) — must be running for warp-cli to work.
+// If the service is stopped, warp-cli fails with
+// "Unable to connect to the CloudflareWARP daemon ... (os error 2)".
+// ==========================================
+
+async function isWarpDaemonRunning() {
+  try {
+    const r = await run(`sc query CloudflareWARP`, 4000);
+    return /STATE\s*:\s*4\s*RUNNING/i.test(r);
+  } catch { return false; }
+}
+
+async function ensureWarpDaemon() {
+  if (await isWarpDaemonRunning()) return true;
+  sendLog('Starting WARP service...', 'warn');
+
+  // Try without elevation first (works if Electron itself was launched as admin)
+  try { await run(`sc start CloudflareWARP`, 5000); } catch {}
+
+  if (!(await isWarpDaemonRunning())) {
+    // Fall back to UAC-elevated start
+    try {
+      await run(
+        `powershell -NoProfile -Command "Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile','-WindowStyle','Hidden','-Command','Start-Service CloudflareWARP' -Wait"`,
+        30000
+      );
+    } catch (e) {
+      sendLog(`Failed to start WARP service: ${e.message}`, 'error');
+      return false;
+    }
+  }
+
+  // Wait up to 10s for the daemon to become ready
+  for (let i = 0; i < 10; i++) {
+    if (await isWarpDaemonRunning()) {
+      // Daemon process is up, but the named pipe may take a moment
+      await delay(800);
+      sendLog('WARP service is running', 'success');
+      return true;
+    }
+    await delay(1000);
+  }
+  sendLog('WARP service did not start in time', 'error');
+  return false;
+}
+
 async function suppressWarpNotifications() {
   try { await run(`"${WARP_CLI}" registration notifications disable`, 3000); } catch {}
   try {
@@ -274,6 +323,7 @@ ipcMain.handle('check-warp', async () => {
   let connected = false, registered = false;
 
   if (installed) {
+    await ensureWarpDaemon();
     try {
       const st = await run(`"${WARP_CLI}" status`, 5000);
       connected   = st.toLowerCase().includes('connected') && !st.toLowerCase().includes('disconnected');
@@ -323,6 +373,12 @@ ipcMain.handle('install-warp', async () => {
 ipcMain.handle('warp-connect', async () => {
   try {
     sendLog('Connecting...');
+
+    // Make sure the WARP service is running, otherwise every warp-cli call below
+    // fails with "Unable to connect to the CloudflareWARP daemon (os error 2)".
+    if (!(await ensureWarpDaemon())) {
+      return { success: false, error: 'WARP service not running' };
+    }
 
     // Check registration
     try {
@@ -609,3 +665,30 @@ function downloadFile(url, dest) {
     doRequest(url);
   });
 }
+
+// ==========================================
+// PRO MODE (sing-box / VLESS)
+// ==========================================
+
+proManager.setLogger((msg, type) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('pro-log', { msg, type });
+  }
+});
+proManager.setStatusListener((s) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('pro-status-update', s);
+  }
+});
+
+ipcMain.handle('pro-status',             async () => proManager.status());
+ipcMain.handle('pro-connect',            async (_, vlessUrl) => proManager.connect(vlessUrl));
+ipcMain.handle('pro-disconnect',         async () => proManager.disconnect());
+ipcMain.handle('pro-set-subscription',   async (_, url) => proManager.setSubscription(url));
+ipcMain.handle('pro-get-subscription',   async () => proManager.getSubscription());
+ipcMain.handle('pro-forget-subscription',async () => proManager.forgetSubscription());
+ipcMain.handle('pro-download-binary',    async () => proManager.downloadSingBox());
+
+app.on('before-quit', async () => {
+  try { await proManager.disconnect(); } catch {}
+});

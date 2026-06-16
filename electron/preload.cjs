@@ -47,3 +47,16 @@ contextBridge.exposeInMainWorld('vpn', {
   onLog:           (cb) => ipcRenderer.on('warp-log', (_, d) => cb(d)),
   onStatusUpdate:  (cb) => ipcRenderer.on('warp-status-update', (_, d) => cb(d)),
 });
+
+// PRO mode (sing-box / VLESS канал)
+contextBridge.exposeInMainWorld('pro', {
+  status:            () => ipcRenderer.invoke('pro-status'),
+  connect:           (vlessUrl) => ipcRenderer.invoke('pro-connect', vlessUrl),
+  disconnect:        () => ipcRenderer.invoke('pro-disconnect'),
+  setSubscription:   (url) => ipcRenderer.invoke('pro-set-subscription', url),
+  getSubscription:   () => ipcRenderer.invoke('pro-get-subscription'),
+  forgetSubscription:() => ipcRenderer.invoke('pro-forget-subscription'),
+  downloadBinary:    () => ipcRenderer.invoke('pro-download-binary'),
+  onLog:             (cb) => ipcRenderer.on('pro-log', (_, d) => cb(d)),
+  onStatusUpdate:    (cb) => ipcRenderer.on('pro-status-update', (_, d) => cb(d)),
+});

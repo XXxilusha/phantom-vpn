@@ -1,4 +1,46 @@
-﻿node_modules/
+node_modules/
 dist/
 release/
 .env
+.env.local
+.env.*.local
+
+# Build caches
+.vite/
+.netlify/
+*.log
+
+# Dev artefacts (puppeteer screenshots / one-off scripts)
+gsc_*
+fill_email.mjs
+phantom454525vpn.txt
+
+# Loose files at root
+/bg.jpg
+
+# Local SQLite / dev DB
+.wrangler/
+*.sqlite
+*.sqlite-journal
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# PRO mode bundled binary — downloaded on demand, not in git
+electron/bin/sing-box.exe
+electron/bin/extract/
+electron/bin/sing-box-download.zip
+
+# Backend (bot + proxy on Cloudflare Workers) — отдельный private/local репо
+# В README/DEPLOY лежат реальные TG/CryptoBot токены — НЕ публикуем
+platform/
+
+# Local secrets
+.secrets.json
+.dev.vars
+
+# iOS PWA — отдельный проект (deployed at phantom-vpn-b34.pages.dev)
+ios/
