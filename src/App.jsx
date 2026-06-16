@@ -562,13 +562,15 @@ export default function App() {
     return unsub;
   }, []);
 
-  // Детект страны через cdn-cgi/trace — нужно для решения Free WARP vs Free VLESS.
+  // Детект страны для аналитики (на поведение не влияет — Free всегда VLESS).
   useEffect(() => {
     if (!window.pro) return;
     window.pro.detectCountry().then((c) => setCountry(c || null)).catch(() => {});
   }, []);
 
-  const freeUsesVless = mode === 'free' && country === 'RU';
+  // Free режим тоже использует VLESS-канал (тот же что Pro, но через Free UUID).
+  // Так надёжнее: не зависит от WARP-сервиса Cloudflare, работает в любой стране.
+  const freeUsesVless = mode === 'free' && window.pro;
 
   useEffect(() => {
     if (state.status === 'connected' && state.stats.connectedSince) {
