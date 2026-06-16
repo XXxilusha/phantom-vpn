@@ -1,6 +1,6 @@
 {
   "name": "phantom-vpn",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Phantom VPN — Free WARP + Pro VLESS channel via Telegram",
   "type": "module",
   "main": "electron/main.cjs",

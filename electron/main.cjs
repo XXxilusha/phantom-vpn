@@ -52,8 +52,9 @@ function createWindow() {
 app.whenReady().then(() => {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   createWindow();
-  suppressWarpNotifications(); // fire-and-forget on startup
-  ensureWarpDaemon();          // make sure the CloudflareWARP service is up
+  // WARP больше не критическая зависимость — Free/Pro используют sing-box (VLESS).
+  // Если юзер явно хочет WARP-режим, ensureWarpDaemon() вызовется лениво из
+  // warpManager.connect(). На запуске ничего лишнего не дёргаем.
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (!mainWindow) createWindow(); });

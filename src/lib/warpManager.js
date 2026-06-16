@@ -77,8 +77,18 @@ class WarpManager {
 
   async init() {
     if (!this._e) { this.status = 'no-electron'; this._log('Desktop app required', 'warn'); this._n(); return; }
-    this._log('Checking WARP...');
 
+    // Если доступен VLESS-движок (window.pro) — Free и Pro работают через него.
+    // WARP инициализировать НЕ надо: пользователь не получит ошибок про "WARP service did not start in time".
+    // Settings page по-прежнему работает (state.killSwitch и т.д. инициализированы в конструкторе).
+    if (typeof window !== 'undefined' && window.pro) {
+      this.status = 'disconnected';
+      try { const as = await window.vpn.autostartStatus(); this.autoStart = as.enabled || false; } catch {}
+      this._n();
+      return;
+    }
+
+    this._log('Checking WARP...');
     const r = await window.vpn.checkWarp();
     this.warpInstalled = r.installed;
     if (r.staticIp) this.staticIp = r.staticIp;

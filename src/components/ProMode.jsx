@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Power, Loader, Globe, Download, MessageCircle, Key,
   AlertCircle, Shield, ArrowUpRight, Trash2, Clock,
+  MapPin, Zap, Cpu, Sparkle,
 } from 'lucide-react';
 import { proManager } from '../lib/proManager';
 
@@ -189,55 +190,39 @@ function FreeBootstrap() {
 }
 
 function FreeConnected({ isConnected, isBusy, status, error, expiresAt, onClick }) {
-  const statusLabel = isConnected ? 'Protected' : isBusy
-    ? (status === 'connecting' ? 'Connecting' : 'Stopping')
+  const statusLabel = isConnected ? 'Free · Защищено' : isBusy
+    ? (status === 'connecting' ? 'Подключение' : 'Отключение')
     : 'Free · Готов';
   const daysLeft = expiresAt ? Math.max(0, Math.ceil((expiresAt * 1000 - Date.now()) / 86400000)) : null;
+  const info = useConnectionInfo(isConnected);
 
   return (
-    <motion.div {...fadeIn} className="space-y-6">
-      <div className="flex items-center justify-center gap-2.5">
-        <span className={`w-2 h-2 rounded-full ${
-          isConnected ? 'bg-white/60 flicker' : isBusy ? 'bg-white/20 animate-pulse' : 'bg-white/10'
-        }`} />
-        <span className="text-[11px] tracking-[0.25em] uppercase text-white/30 font-gothic">
-          {statusLabel}
-        </span>
-      </div>
-
+    <motion.div {...fadeIn} className="space-y-5">
+      <StatusBar isConnected={isConnected} isBusy={isBusy} status={status} label={statusLabel} />
       <PowerCircle isConnected={isConnected} isBusy={isBusy} onClick={onClick} />
 
-      {/* Free info row */}
-      <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] px-3.5 py-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Shield size={12} strokeWidth={1.5} className="text-white/30" />
-            <span className="text-[10px] tracking-[0.18em] uppercase text-white/30">Free тариф</span>
-          </div>
-          {daysLeft !== null && (
-            <div className="flex items-center gap-1.5">
-              <Clock size={10} strokeWidth={1.5} className="text-white/20" />
-              <span className="text-[10px] text-white/30 font-mono">{daysLeft} дн.</span>
-            </div>
-          )}
-        </div>
-        <p className="text-[10px] text-white/25 leading-relaxed pl-[22px]">
-          1 устройство, автообновляется. VLESS-канал для обхода блокировок в РФ.
-        </p>
-      </div>
+      <AnimatePresence>
+        {isConnected && (
+          <motion.div key="info" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0}}>
+            <InfoPanel
+              tier="free"
+              ip={info.ip}
+              location={info.location}
+              uptime={info.uptime}
+              extraLabel="Free · 1 устройство"
+              extraValue={daysLeft !== null ? `обновится через ${daysLeft} дн.` : null}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {isConnected && <TrafficPulse />}
 
       {!isConnected && !isBusy && (
-        <p className="text-white/10 text-[11px] text-center tracking-wider">
-          Жми кнопку — Phantom направит трафик через зашифрованный канал
+        <p className="text-white/15 text-[11px] text-center tracking-wider px-4 leading-relaxed">
+          Free · 1 устройство · автообновление 30 дней<br/>
+          VLESS-канал, работает в России и везде
         </p>
-      )}
-
-      {isConnected && (
-        <div className="flex justify-center gap-2 flex-wrap">
-          <Badge label="VLESS" />
-          <Badge label="Cloudflare" />
-          <Badge label="TLS" />
-        </div>
       )}
 
       {!isConnected && (
@@ -247,7 +232,7 @@ function FreeConnected({ isConnected, isBusy, status, error, expiresAt, onClick 
           rel="noopener noreferrer"
           className="block text-center text-[10px] text-white/22 hover:text-white/50 tracking-[0.18em] uppercase transition-colors py-2"
         >
-          Больше устройств · перейти на Pro →
+          Больше устройств и приоритет · Pro →
         </a>
       )}
 
@@ -335,28 +320,51 @@ function ProConnected({ isConnected, isBusy, status, error, onClick, onForget, s
   const subHost = (() => {
     try { return new URL(subscription).hostname; } catch { return 'unknown'; }
   })();
-  const statusLabel = isConnected ? 'Pro · Protected' : isBusy
-    ? (status === 'connecting' ? 'Connecting' : 'Stopping')
+  const statusLabel = isConnected ? 'Pro · Защищено' : isBusy
+    ? (status === 'connecting' ? 'Подключение' : 'Отключение')
     : 'Pro · Готов';
+  const info = useConnectionInfo(isConnected);
 
   return (
-    <motion.div {...fadeIn} className="space-y-6">
-      <div className="flex items-center justify-center gap-2.5">
-        <span className={`w-2 h-2 rounded-full ${
-          isConnected ? 'bg-white/60 flicker' : isBusy ? 'bg-white/20 animate-pulse' : 'bg-white/10'
-        }`} />
-        <span className="text-[11px] tracking-[0.25em] uppercase text-white/30 font-gothic">
-          {statusLabel}
+    <motion.div {...fadeIn} className="space-y-5">
+      {/* Pro premium banner */}
+      <div className="flex items-center justify-center gap-2 -mt-1">
+        <Sparkle size={11} strokeWidth={1.5} className="text-white/55" />
+        <span className="text-[10px] tracking-[0.32em] uppercase text-white/55 font-medium">
+          Phantom Pro
         </span>
+        <Sparkle size={11} strokeWidth={1.5} className="text-white/55" />
       </div>
 
-      <PowerCircle isConnected={isConnected} isBusy={isBusy} onClick={onClick} />
+      <StatusBar isConnected={isConnected} isBusy={isBusy} status={status} label={statusLabel} accent />
+      <PowerCircle isConnected={isConnected} isBusy={isBusy} onClick={onClick} accent />
 
-      <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] px-3.5 py-3 space-y-2">
+      <AnimatePresence>
+        {isConnected && (
+          <motion.div key="info" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0}}>
+            <InfoPanel
+              tier="pro"
+              ip={info.ip}
+              location={info.location}
+              uptime={info.uptime}
+              extraLabel="Pro · до 3 устройств"
+              extraValue="Приоритетный канал"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Locations preview — coming in v3.5 */}
+      {isConnected && (
+        <LocationRow />
+      )}
+
+      {/* subscription row */}
+      <div className="rounded-xl bg-white/[0.025] border border-white/[0.06] px-3.5 py-3 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Shield size={12} strokeWidth={1.5} className="text-white/30" />
-            <span className="text-[10px] tracking-[0.18em] uppercase text-white/30">Подписка Pro</span>
+            <Shield size={12} strokeWidth={1.5} className="text-white/45" />
+            <span className="text-[10px] tracking-[0.18em] uppercase text-white/45">Подписка</span>
           </div>
           <button
             onClick={onForget}
@@ -368,23 +376,17 @@ function ProConnected({ isConnected, isBusy, status, error, onClick, onForget, s
           </button>
         </div>
         <div className="flex items-center gap-2 pl-[22px]">
-          <Globe size={11} strokeWidth={1.5} className="text-white/18" />
-          <span className="text-[11px] text-white/40 font-mono truncate">{subHost}</span>
+          <Globe size={11} strokeWidth={1.5} className="text-white/30" />
+          <span className="text-[11px] text-white/55 font-mono truncate">{subHost}</span>
         </div>
       </div>
 
-      {!isConnected && !isBusy && (
-        <p className="text-white/10 text-[11px] text-center tracking-wider">
-          Жми кнопку — Phantom направит трафик через VLESS-канал
-        </p>
-      )}
+      {isConnected && <TrafficPulse accent />}
 
-      {isConnected && (
-        <div className="flex justify-center gap-2 flex-wrap">
-          <Badge label="VLESS" />
-          <Badge label="Cloudflare" />
-          <Badge label="TLS" />
-        </div>
+      {!isConnected && !isBusy && (
+        <p className="text-white/15 text-[11px] text-center tracking-wider">
+          Жми кнопку — Phantom направит трафик через приоритетный VLESS-канал
+        </p>
       )}
 
       {!isConnected && !isBusy && (
@@ -392,7 +394,7 @@ function ProConnected({ isConnected, isBusy, status, error, onClick, onForget, s
           href={`https://t.me/${BOT_USERNAME}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block text-center text-[10px] text-white/22 hover:text-white/50 tracking-[0.18em] uppercase transition-colors py-2"
+          className="block text-center text-[10px] text-white/35 hover:text-white/70 tracking-[0.18em] uppercase transition-colors py-2"
         >
           Управлять подпиской в Telegram →
         </a>
@@ -403,18 +405,38 @@ function ProConnected({ isConnected, isBusy, status, error, onClick, onForget, s
   );
 }
 
-/* ─────────── Shared: power button ─────────── */
+/* ─────────── Shared: status bar, power button, info panel, traffic pulse ─────────── */
 
-function PowerCircle({ isConnected, isBusy, onClick }) {
+function StatusBar({ isConnected, isBusy, status, label, accent }) {
+  const dotColor = isConnected ? (accent ? 'bg-white/85 flicker' : 'bg-white/60 flicker')
+    : isBusy ? 'bg-white/20 animate-pulse' : 'bg-white/10';
+  return (
+    <div className="flex items-center justify-center gap-2.5">
+      <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+      <span className={`text-[11px] tracking-[0.25em] uppercase font-gothic ${accent && isConnected ? 'text-white/65' : 'text-white/30'}`}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function PowerCircle({ isConnected, isBusy, onClick, accent }) {
+  const ringColor = accent ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)';
+  const innerBg = accent && isConnected ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)';
+  const borderColor = accent && isConnected ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)';
+  const iconColor = isConnected ? (accent ? 'text-white/80' : 'text-white/55') : 'text-white/30';
+  const labelColor = isConnected ? (accent ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.55)') : 'rgba(255,255,255,0.3)';
+
   return (
     <div className="relative flex items-center justify-center my-2">
       <AnimatePresence>
         {isConnected && [0, 0.8, 1.6].map((d, i) => (
           <motion.div
             key={i}
-            className="absolute w-44 h-44 rounded-full border border-white/[0.04]"
+            className="absolute w-44 h-44 rounded-full border"
+            style={{ borderColor: ringColor }}
             initial={{ scale: 0.85, opacity: 0 }}
-            animate={{ scale: [0.85, 1.8], opacity: [0.3, 0] }}
+            animate={{ scale: [0.85, 1.8], opacity: [accent ? 0.45 : 0.3, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: d }}
           />
         ))}
@@ -427,23 +449,135 @@ function PowerCircle({ isConnected, isBusy, onClick }) {
         whileTap={!isBusy ? { scale: 0.93 } : {}}
         transition={spring}
         className="relative z-10 w-36 h-36 rounded-full flex flex-col items-center justify-center gap-2.5
-          border border-white/[0.05] disabled:opacity-40 disabled:cursor-wait"
-        style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(20px)' }}
+          border disabled:opacity-40 disabled:cursor-wait"
+        style={{ background: innerBg, borderColor, backdropFilter: 'blur(20px)' }}
       >
         {isBusy ? (
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}>
-            <Loader size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/25'} />
+            <Loader size={30} strokeWidth={1.2} className={iconColor} />
           </motion.div>
         ) : (
-          <Power size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/30'} />
+          <Power size={30} strokeWidth={1.2} className={iconColor} />
         )}
-        <span className="text-[9px] font-medium tracking-[0.3em] uppercase"
-          style={{ color: isConnected ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.3)' }}>
+        <span className="text-[9px] font-medium tracking-[0.3em] uppercase" style={{ color: labelColor }}>
           {isConnected ? 'Disconnect' : 'Connect'}
         </span>
       </motion.button>
     </div>
   );
+}
+
+function InfoPanel({ tier, ip, location, uptime, extraLabel, extraValue }) {
+  const isPro = tier === 'pro';
+  return (
+    <div
+      className="rounded-xl px-3.5 py-3.5 space-y-2.5 border"
+      style={{
+        background: isPro ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.02)',
+        borderColor: isPro ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
+      }}
+    >
+      <InfoRow icon={Globe} label="IP" value={ip || '...'} />
+      <InfoRow icon={MapPin} label="Локация" value={location || '...'} />
+      <InfoRow icon={Clock} label="Сессия" value={uptime} mono />
+      {extraLabel && (
+        <InfoRow icon={isPro ? Cpu : Shield} label={extraLabel} value={extraValue || ''} accent={isPro} />
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ icon: Icon, label, value, mono, accent }) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2.5">
+        <Icon size={12} strokeWidth={1.5} className={accent ? 'text-white/55' : 'text-white/25'} />
+        <span className={`text-[11px] tracking-wider ${accent ? 'text-white/55' : 'text-white/35'}`}>{label}</span>
+      </div>
+      <span className={`text-[11px] ${mono ? 'font-mono' : ''} ${accent ? 'text-white/75' : 'text-white/55'} truncate max-w-[55%] text-right`}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function LocationRow() {
+  return (
+    <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+      <div className="flex items-center gap-2.5">
+        <MapPin size={12} strokeWidth={1.5} className="text-white/35" />
+        <span className="text-[11px] tracking-wider text-white/45">Локация</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-[11px] text-white/55">Авто · Cloudflare</span>
+        <span className="text-[8px] text-white/25 tracking-[0.2em] uppercase ml-1.5 px-1.5 py-0.5 rounded border border-white/[0.05]">
+          v3.5
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TrafficPulse({ accent }) {
+  return (
+    <div className="flex items-center justify-center gap-6 py-1">
+      <PulseDot direction="down" accent={accent} />
+      <PulseDot direction="up" delay={0.4} accent={accent} />
+    </div>
+  );
+}
+
+function PulseDot({ direction, delay = 0, accent }) {
+  return (
+    <div className="flex items-center gap-2">
+      <motion.div
+        className="w-1 h-1 rounded-full"
+        style={{ background: accent ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.35)' }}
+        animate={{ opacity: [0.2, 1, 0.2], scale: [0.85, 1.4, 0.85] }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut', delay }}
+      />
+      <span className="text-[8px] text-white/20 tracking-[0.3em] uppercase">
+        {direction === 'down' ? '↓ in' : '↑ out'}
+      </span>
+    </div>
+  );
+}
+
+// ── Хук: подтягивает IP, локацию, и считает аптайм
+function useConnectionInfo(isConnected) {
+  const [info, setInfo] = useState({ ip: '', location: '', uptime: '00:00:00' });
+  const startRef = useRef(null);
+
+  useEffect(() => {
+    if (!isConnected) { startRef.current = null; setInfo((s) => ({ ...s, uptime: '00:00:00' })); return; }
+    startRef.current = Date.now();
+    let cancelled = false;
+    (async () => {
+      try {
+        if (window.vpn?.getPublicIp) {
+          const ip = await window.vpn.getPublicIp();
+          if (!cancelled) setInfo((s) => ({ ...s, ip: ip || '' }));
+        }
+        if (window.vpn?.getIpInfo) {
+          const i = await window.vpn.getIpInfo();
+          if (!cancelled && i?.country) {
+            const loc = i.city ? `${i.city}, ${i.country}` : i.country;
+            setInfo((s) => ({ ...s, location: loc }));
+          }
+        }
+      } catch {}
+    })();
+    const t = setInterval(() => {
+      if (!startRef.current) return;
+      const s = Math.floor((Date.now() - startRef.current) / 1000);
+      const hms = [s / 3600 | 0, (s % 3600) / 60 | 0, s % 60]
+        .map((v) => String(v).padStart(2, '0')).join(':');
+      setInfo((prev) => ({ ...prev, uptime: hms }));
+    }, 1000);
+    return () => { cancelled = true; clearInterval(t); };
+  }, [isConnected]);
+
+  return info;
 }
 
 function Badge({ label }) {
