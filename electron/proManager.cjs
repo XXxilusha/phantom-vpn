@@ -1,19 +1,19 @@
 /**
- * Phantom VPN — PRO mode manager.
+ * Phantom VPN — VLESS engine manager (используется и для FREE-в-РФ, и для PRO).
  *
  * Запускает sing-box.exe как локальный SOCKS5/HTTP-прокси, конфигурирует Windows
- * системный прокси на этот endpoint. Когда юзер отключается — восстанавливает прокси.
+ * системный прокси. Когда юзер отключается — восстанавливает прокси.
  *
- * Почему НЕ TUN: TUN требует admin-прав + установки Wintun driver. Для MVP идём через
- * системный прокси (без admin, работает в браузерах и большинстве приложений).
- * Когда наберём аудиторию — добавим опциональный TUN-режим с UAC.
+ * Две подписки хранятся раздельно:
+ *   • freeSub  — авто-полученная с phantom-vpn-bot/api/free/register, 30 дней,
+ *                автообновляется когда осталось < 5 дней
+ *   • proSub   — VLESS-ссылка из Telegram-бота (купленная подписка)
+ *
+ * Какую использовать — решает connect({tier}). Дефолт: pro если есть, иначе free.
  *
  * Бинарь sing-box.exe ожидается в:
  *   • dev:        <projectRoot>/electron/bin/sing-box.exe
  *   • production: process.resourcesPath/bin/sing-box.exe
- *
- * Если бинаря нет — connect() вернёт { success: false, needsBinary: true } и фронт
- * покажет пользователю кнопку «Загрузить sing-box».
  */
 
 const path = require('path');
@@ -42,6 +42,14 @@ function subscriptionStorePath() {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   return path.join(dir, 'pro-subscription.json');
 }
+function freeStorePath() {
+  const dir = path.join(app.getPath('userData'), 'phantom-data');
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, 'free-subscription.json');
+}
+
+const BOT_API_BASE = 'https://phantom-vpn-bot.conza300176.workers.dev';
+const FREE_RENEW_THRESHOLD_DAYS = 5;
 
 // ── состояние ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +59,7 @@ const HTTP_PORT = 17711;
 
 let proc = null;
 let connected = false;
+let currentTier = null; // 'pro' | 'free' | null
 let onLog = () => {};
 let onStatusChange = () => {};
 
@@ -178,6 +187,99 @@ function clearSubscription() {
   try { fs.unlinkSync(subscriptionStorePath()); } catch {}
 }
 
+// ── Free подписка (хранится отдельно от платной) ──
+function saveFree(record) {
+  try { fs.writeFileSync(freeStorePath(), JSON.stringify(record, null, 2)); } catch {}
+}
+function loadFree() {
+  try {
+    if (!fs.existsSync(freeStorePath())) return null;
+    return JSON.parse(fs.readFileSync(freeStorePath(), 'utf8'));
+  } catch { return null; }
+}
+function clearFree() { try { fs.unlinkSync(freeStorePath()); } catch {} }
+
+// ── HTTP helper ──
+function httpsJson(method, urlString, body) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(urlString);
+    const data = body ? JSON.stringify(body) : '';
+    const req = https.request({
+      method,
+      hostname: u.hostname,
+      path: u.pathname + u.search,
+      port: 443,
+      headers: {
+        'User-Agent': 'phantom-vpn-electron',
+        ...(data ? { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) } : {}),
+      },
+    }, (res) => {
+      let chunks = '';
+      res.on('data', (c) => chunks += c);
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, body: chunks ? JSON.parse(chunks) : null }); }
+        catch { resolve({ status: res.statusCode, body: chunks }); }
+      });
+    });
+    req.on('error', reject);
+    if (data) req.write(data);
+    req.end();
+  });
+}
+
+// ── детект страны через Cloudflare trace ──
+async function detectCountry() {
+  return new Promise((resolve) => {
+    https.get('https://www.cloudflare.com/cdn-cgi/trace', (res) => {
+      let body = '';
+      res.on('data', (c) => body += c);
+      res.on('end', () => {
+        const m = /^loc=(\w{2})$/m.exec(body);
+        resolve(m ? m[1].toUpperCase() : null);
+      });
+    }).on('error', () => resolve(null));
+  });
+}
+
+// ── авто-регистрация / обновление Free подписки ──
+async function ensureFreeSubscription() {
+  const now = Math.floor(Date.now() / 1000);
+  let existing = loadFree();
+
+  // первый запуск — регистрируем
+  if (!existing) {
+    onLog('Регистрируем Free подписку…', 'info');
+    const res = await httpsJson('POST', `${BOT_API_BASE}/api/free/register`);
+    if (res.status !== 200 || !res.body?.uuid) {
+      throw new Error(`Free register failed: ${res.status} ${JSON.stringify(res.body)}`);
+    }
+    existing = { uuid: res.body.uuid, expires_at: res.body.expires_at, sub_url: res.body.sub_url };
+    saveFree(existing);
+    onLog('Free подписка получена', 'success');
+    return existing;
+  }
+
+  // продлеваем за 5 дней до конца
+  const secondsLeft = existing.expires_at - now;
+  if (secondsLeft < FREE_RENEW_THRESHOLD_DAYS * 86400) {
+    try {
+      onLog('Обновляем Free подписку…', 'info');
+      const res = await httpsJson('POST', `${BOT_API_BASE}/api/free/renew`, { uuid: existing.uuid });
+      if (res.status === 200 && res.body?.uuid) {
+        existing = { uuid: res.body.uuid, expires_at: res.body.expires_at, sub_url: res.body.sub_url };
+        saveFree(existing);
+      } else if (res.status === 404) {
+        // сервер забыл наш UUID — регистрируем новый
+        clearFree();
+        return ensureFreeSubscription();
+      }
+    } catch (e) {
+      onLog(`Free renew failed: ${e.message}`, 'warn');
+    }
+  }
+  return existing;
+}
+
 // ── Windows-прокси ──────────────────────────────────────────────────────────────
 
 function setSystemProxy(enabled) {
@@ -276,11 +378,53 @@ async function stopSingBox() {
 
 // ── публичный API ───────────────────────────────────────────────────────────────
 
-async function connect(vlessUrlOptional) {
-  const url = vlessUrlOptional || loadSubscription();
-  if (!url) return { success: false, error: 'Нет VLESS-ссылки. Вставь её из бота.' };
+/**
+ * Подключение к VLESS-каналу.
+ *   options.tier = 'pro' | 'free' | undefined
+ *   options.url  = явный VLESS URL (для случая когда юзер вставил вручную)
+ *
+ * Логика выбора подписки:
+ *   1. Явный url → используем его (плюс сохраняем в pro-slot)
+ *   2. tier='free' → ensureFreeSubscription()
+ *   3. tier='pro' или undefined → loadSubscription() (Pro), fallback на Free
+ */
+async function connect(optionsOrUrl) {
+  let url;
+  let tier = 'pro';
 
-  if (vlessUrlOptional) saveSubscription(vlessUrlOptional);
+  if (typeof optionsOrUrl === 'string') {
+    url = optionsOrUrl;
+    saveSubscription(url);
+  } else if (optionsOrUrl && typeof optionsOrUrl === 'object') {
+    tier = optionsOrUrl.tier || 'pro';
+    if (optionsOrUrl.url) {
+      url = optionsOrUrl.url;
+      if (tier === 'pro') saveSubscription(url);
+    }
+  }
+
+  if (!url) {
+    if (tier === 'free') {
+      try {
+        const free = await ensureFreeSubscription();
+        url = free.sub_url;
+      } catch (e) {
+        return { success: false, error: `Free регистрация: ${e.message}` };
+      }
+    } else {
+      url = loadSubscription();
+      if (!url) {
+        // pro нет — fallback на Free
+        try {
+          const free = await ensureFreeSubscription();
+          url = free.sub_url;
+          tier = 'free';
+        } catch (e) {
+          return { success: false, error: 'Нет подписки. Открой бот в Telegram.' };
+        }
+      }
+    }
+  }
 
   const r = await startSingBox(url);
   if (!r.success) return r;
@@ -292,24 +436,31 @@ async function connect(vlessUrlOptional) {
   }
 
   connected = true;
-  onStatusChange({ connected: true });
-  onLog('PRO connected', 'success');
-  return { success: true };
+  currentTier = tier;
+  onStatusChange({ connected: true, tier });
+  onLog(`${tier === 'pro' ? 'PRO' : 'FREE'} connected`, 'success');
+  return { success: true, tier };
 }
 
 async function disconnect() {
   await setSystemProxy(false);
   await stopSingBox();
   connected = false;
-  onStatusChange({ connected: false });
-  onLog('PRO disconnected', 'info');
+  const wasTier = currentTier;
+  currentTier = null;
+  onStatusChange({ connected: false, tier: null });
+  onLog(`${wasTier === 'pro' ? 'PRO' : 'FREE'} disconnected`, 'info');
   return { success: true };
 }
 
 function status() {
+  const free = loadFree();
   return {
     connected,
+    tier: currentTier,
     hasSubscription: !!loadSubscription(),
+    hasFreeSubscription: !!free,
+    freeExpiresAt: free?.expires_at ?? null,
     binaryAvailable: singBoxAvailable(),
     socks: { host: SOCKS_HOST, port: SOCKS_PORT },
     http: { host: SOCKS_HOST, port: HTTP_PORT },
@@ -428,6 +579,8 @@ module.exports = {
   forgetSubscription,
   downloadSingBox,
   parseVlessUrl,
+  detectCountry,
+  ensureFreeSubscription,
   setLogger,
   setStatusListener,
 };

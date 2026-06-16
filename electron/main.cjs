@@ -682,12 +682,17 @@ proManager.setStatusListener((s) => {
 });
 
 ipcMain.handle('pro-status',             async () => proManager.status());
-ipcMain.handle('pro-connect',            async (_, vlessUrl) => proManager.connect(vlessUrl));
+ipcMain.handle('pro-connect',            async (_, payload) => proManager.connect(payload));
 ipcMain.handle('pro-disconnect',         async () => proManager.disconnect());
 ipcMain.handle('pro-set-subscription',   async (_, url) => proManager.setSubscription(url));
 ipcMain.handle('pro-get-subscription',   async () => proManager.getSubscription());
 ipcMain.handle('pro-forget-subscription',async () => proManager.forgetSubscription());
 ipcMain.handle('pro-download-binary',    async () => proManager.downloadSingBox());
+ipcMain.handle('pro-detect-country',     async () => proManager.detectCountry());
+ipcMain.handle('pro-ensure-free',        async () => {
+  try { return await proManager.ensureFreeSubscription(); }
+  catch (e) { return { error: e.message }; }
+});
 
 app.on('before-quit', async () => {
   try { await proManager.disconnect(); } catch {}

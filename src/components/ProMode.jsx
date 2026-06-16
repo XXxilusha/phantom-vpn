@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Power, Loader, Globe, Download, MessageCircle, Key,
-  AlertCircle, Shield, ArrowRight, Trash2, ArrowUpRight,
+  AlertCircle, Shield, ArrowUpRight, Trash2, Clock,
 } from 'lucide-react';
 import { proManager } from '../lib/proManager';
 
@@ -16,10 +16,17 @@ const fadeIn = {
   transition: { duration: 0.4 },
 };
 
-export default function ProMode({ t }) {
+/**
+ * tier: 'pro' (по умолчанию) — поток с Telegram-ботом и вставкой VLESS вручную.
+ *       'free' — авто-регистрация Free UUID, юзер видит только Connect.
+ */
+export default function ProMode({ tier = 'pro' }) {
   const [s, setS] = useState({
     proStatus: 'disconnected',
+    proTier: null,
     proSubscription: null,
+    proHasFree: false,
+    proFreeExpiresAt: null,
     proHasBinary: false,
     proError: null,
     proBusy: false,
@@ -28,6 +35,7 @@ export default function ProMode({ t }) {
   const [urlInput, setUrlInput] = useState('');
   const [urlInputErr, setUrlInputErr] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [freeBootstrapping, setFreeBootstrapping] = useState(false);
 
   useEffect(() => {
     const unsub = proManager.onChange(setS);
@@ -35,17 +43,29 @@ export default function ProMode({ t }) {
     return unsub;
   }, []);
 
+  // tier='free' и нет freeSub → авто-регистрация при заходе в режим
+  useEffect(() => {
+    if (tier !== 'free' || !s.proHasBinary || s.proHasFree || freeBootstrapping) return;
+    setFreeBootstrapping(true);
+    proManager.ensureFree().finally(() => setFreeBootstrapping(false));
+  }, [tier, s.proHasBinary, s.proHasFree, freeBootstrapping]);
+
   const isConnected = s.proStatus === 'connected';
   const isBusy = s.proStatus === 'connecting' || s.proStatus === 'disconnecting';
   const noBinary = !s.proHasBinary;
-  const hasSubscription = !!s.proSubscription;
+  const hasProSubscription = !!s.proSubscription;
+  const hasFreeSubscription = !!s.proHasFree;
 
-  const onConnect = async () => {
+  const onConnectPro = async () => {
     if (isConnected) return proManager.disconnect();
-    if (!hasSubscription && !urlInput.trim()) return;
+    if (!hasProSubscription && !urlInput.trim()) return;
     const url = urlInput.trim() || s.proSubscription;
-    const r = await proManager.connect(url);
+    const r = await proManager.connect({ tier: 'pro', url: urlInput.trim() ? url : undefined });
     if (r?.success) setUrlInput('');
+  };
+  const onConnectFree = async () => {
+    if (isConnected) return proManager.disconnect();
+    await proManager.connect({ tier: 'free' });
   };
 
   const onSaveUrl = async () => {
@@ -60,12 +80,32 @@ export default function ProMode({ t }) {
   const onForget = async () => proManager.forgetSubscription();
   const onDownload = async () => proManager.downloadBinary();
 
+  // Binary missing — auto-download CTA (общий для обоих tier)
+  if (noBinary) {
+    return (
+      <motion.div {...fadeIn} className="relative w-full">
+        <BinaryGate downloading={s.proDownloading} error={s.proError} onDownload={onDownload} />
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div {...fadeIn} className="relative w-full">
-      {noBinary ? (
-        <BinaryGate downloading={s.proDownloading} error={s.proError} onDownload={onDownload} />
-      ) : !hasSubscription ? (
-        <Onboarding
+      {tier === 'free' ? (
+        freeBootstrapping || !hasFreeSubscription ? (
+          <FreeBootstrap />
+        ) : (
+          <FreeConnected
+            isConnected={isConnected}
+            isBusy={isBusy}
+            status={s.proStatus}
+            error={s.proError}
+            expiresAt={s.proFreeExpiresAt}
+            onClick={onConnectFree}
+          />
+        )
+      ) : !hasProSubscription ? (
+        <ProOnboarding
           urlInput={urlInput}
           setUrlInput={setUrlInput}
           err={urlInputErr}
@@ -75,12 +115,12 @@ export default function ProMode({ t }) {
           setShowAdvanced={setShowAdvanced}
         />
       ) : (
-        <Connected
+        <ProConnected
           isConnected={isConnected}
           isBusy={isBusy}
           status={s.proStatus}
           error={s.proError}
-          onClick={onConnect}
+          onClick={onConnectPro}
           onForget={onForget}
           subscription={s.proSubscription}
         />
@@ -89,7 +129,7 @@ export default function ProMode({ t }) {
   );
 }
 
-/* ─────────── Binary missing — auto-download from GitHub ─────────── */
+/* ─────────── Binary gate ─────────── */
 
 function BinaryGate({ downloading, error, onDownload }) {
   return (
@@ -98,10 +138,9 @@ function BinaryGate({ downloading, error, onDownload }) {
         <Download size={26} strokeWidth={1.2} className="text-white/25 mx-auto" />
         <h3 className="text-[13px] text-white/55 font-medium tracking-wide">Установка движка</h3>
         <p className="text-[11px] text-white/30 leading-relaxed max-w-xs mx-auto">
-          Pro-режиму нужен бинарь sing-box (~20 МБ). Загружается один раз с GitHub.
+          Нужен бинарь sing-box (~20 МБ). Загружается один раз с GitHub.
         </p>
       </div>
-
       <motion.button
         onClick={onDownload}
         disabled={downloading}
@@ -128,9 +167,7 @@ function BinaryGate({ downloading, error, onDownload }) {
           </>
         )}
       </motion.button>
-
       {error && <ErrorRow text={error} />}
-
       <p className="text-[9px] text-white/15 text-center tracking-wider">
         github.com/SagerNet/sing-box
       </p>
@@ -138,9 +175,90 @@ function BinaryGate({ downloading, error, onDownload }) {
   );
 }
 
-/* ─────────── Onboarding — Telegram CTA + manual VLESS ─────────── */
+/* ─────────── FREE: bootstrap / connected ─────────── */
 
-function Onboarding({ urlInput, setUrlInput, err, setErr, onSave, showAdvanced, setShowAdvanced }) {
+function FreeBootstrap() {
+  return (
+    <motion.div {...fadeIn} className="text-center space-y-3 py-10">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}>
+        <Loader size={22} strokeWidth={1.2} className="text-white/20 mx-auto" />
+      </motion.div>
+      <p className="text-[11px] text-white/30 tracking-wider">Готовим бесплатную подписку…</p>
+    </motion.div>
+  );
+}
+
+function FreeConnected({ isConnected, isBusy, status, error, expiresAt, onClick }) {
+  const statusLabel = isConnected ? 'Protected' : isBusy
+    ? (status === 'connecting' ? 'Connecting' : 'Stopping')
+    : 'Free · Готов';
+  const daysLeft = expiresAt ? Math.max(0, Math.ceil((expiresAt * 1000 - Date.now()) / 86400000)) : null;
+
+  return (
+    <motion.div {...fadeIn} className="space-y-6">
+      <div className="flex items-center justify-center gap-2.5">
+        <span className={`w-2 h-2 rounded-full ${
+          isConnected ? 'bg-white/60 flicker' : isBusy ? 'bg-white/20 animate-pulse' : 'bg-white/10'
+        }`} />
+        <span className="text-[11px] tracking-[0.25em] uppercase text-white/30 font-gothic">
+          {statusLabel}
+        </span>
+      </div>
+
+      <PowerCircle isConnected={isConnected} isBusy={isBusy} onClick={onClick} />
+
+      {/* Free info row */}
+      <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] px-3.5 py-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Shield size={12} strokeWidth={1.5} className="text-white/30" />
+            <span className="text-[10px] tracking-[0.18em] uppercase text-white/30">Free тариф</span>
+          </div>
+          {daysLeft !== null && (
+            <div className="flex items-center gap-1.5">
+              <Clock size={10} strokeWidth={1.5} className="text-white/20" />
+              <span className="text-[10px] text-white/30 font-mono">{daysLeft} дн.</span>
+            </div>
+          )}
+        </div>
+        <p className="text-[10px] text-white/25 leading-relaxed pl-[22px]">
+          1 устройство, автообновляется. VLESS-канал для обхода блокировок в РФ.
+        </p>
+      </div>
+
+      {!isConnected && !isBusy && (
+        <p className="text-white/10 text-[11px] text-center tracking-wider">
+          Жми кнопку — Phantom направит трафик через зашифрованный канал
+        </p>
+      )}
+
+      {isConnected && (
+        <div className="flex justify-center gap-2 flex-wrap">
+          <Badge label="VLESS" />
+          <Badge label="Cloudflare" />
+          <Badge label="TLS" />
+        </div>
+      )}
+
+      {!isConnected && (
+        <a
+          href={`https://t.me/${BOT_USERNAME}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-center text-[10px] text-white/22 hover:text-white/50 tracking-[0.18em] uppercase transition-colors py-2"
+        >
+          Больше устройств · перейти на Pro →
+        </a>
+      )}
+
+      {error && <ErrorRow text={error} />}
+    </motion.div>
+  );
+}
+
+/* ─────────── PRO onboarding (нет подписки) ─────────── */
+
+function ProOnboarding({ urlInput, setUrlInput, err, setErr, onSave, showAdvanced, setShowAdvanced }) {
   const tgLink = `https://t.me/${BOT_USERNAME}`;
   return (
     <motion.div {...fadeIn} className="space-y-5 px-2 py-2">
@@ -211,19 +329,18 @@ function Onboarding({ urlInput, setUrlInput, err, setErr, onSave, showAdvanced, 
   );
 }
 
-/* ─────────── Connected — minimal power button screen ─────────── */
+/* ─────────── PRO connected (с подпиской) ─────────── */
 
-function Connected({ isConnected, isBusy, status, error, onClick, onForget, subscription }) {
+function ProConnected({ isConnected, isBusy, status, error, onClick, onForget, subscription }) {
   const subHost = (() => {
     try { return new URL(subscription).hostname; } catch { return 'unknown'; }
   })();
-  const statusLabel = isConnected ? 'Protected' : isBusy
+  const statusLabel = isConnected ? 'Pro · Protected' : isBusy
     ? (status === 'connecting' ? 'Connecting' : 'Stopping')
-    : 'Disconnected';
+    : 'Pro · Готов';
 
   return (
     <motion.div {...fadeIn} className="space-y-6">
-      {/* status dot */}
       <div className="flex items-center justify-center gap-2.5">
         <span className={`w-2 h-2 rounded-full ${
           isConnected ? 'bg-white/60 flicker' : isBusy ? 'bg-white/20 animate-pulse' : 'bg-white/10'
@@ -233,50 +350,13 @@ function Connected({ isConnected, isBusy, status, error, onClick, onForget, subs
         </span>
       </div>
 
-      {/* power button — same style as FREE for consistency */}
-      <div className="relative flex items-center justify-center my-2">
-        <AnimatePresence>
-          {isConnected && [0, 0.8, 1.6].map((d, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-44 h-44 rounded-full border border-white/[0.04]"
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: [0.85, 1.8], opacity: [0.3, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: d }}
-            />
-          ))}
-        </AnimatePresence>
+      <PowerCircle isConnected={isConnected} isBusy={isBusy} onClick={onClick} />
 
-        <motion.button
-          onClick={onClick}
-          disabled={isBusy}
-          whileHover={!isBusy ? { scale: 1.07 } : {}}
-          whileTap={!isBusy ? { scale: 0.93 } : {}}
-          transition={spring}
-          className="relative z-10 w-36 h-36 rounded-full flex flex-col items-center justify-center gap-2.5
-            border border-white/[0.05] disabled:opacity-40 disabled:cursor-wait"
-          style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(20px)' }}
-        >
-          {isBusy ? (
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}>
-              <Loader size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/25'} />
-            </motion.div>
-          ) : (
-            <Power size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/30'} />
-          )}
-          <span className="text-[9px] font-medium tracking-[0.3em] uppercase"
-            style={{ color: isConnected ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.3)' }}>
-            {isConnected ? 'Disconnect' : 'Connect'}
-          </span>
-        </motion.button>
-      </div>
-
-      {/* subscription row */}
       <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] px-3.5 py-3 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Shield size={12} strokeWidth={1.5} className="text-white/30" />
-            <span className="text-[10px] tracking-[0.18em] uppercase text-white/30">Подписка</span>
+            <span className="text-[10px] tracking-[0.18em] uppercase text-white/30">Подписка Pro</span>
           </div>
           <button
             onClick={onForget}
@@ -293,14 +373,12 @@ function Connected({ isConnected, isBusy, status, error, onClick, onForget, subs
         </div>
       </div>
 
-      {/* tip */}
       {!isConnected && !isBusy && (
         <p className="text-white/10 text-[11px] text-center tracking-wider">
           Жми кнопку — Phantom направит трафик через VLESS-канал
         </p>
       )}
 
-      {/* badges */}
       {isConnected && (
         <div className="flex justify-center gap-2 flex-wrap">
           <Badge label="VLESS" />
@@ -309,7 +387,6 @@ function Connected({ isConnected, isBusy, status, error, onClick, onForget, subs
         </div>
       )}
 
-      {/* upgrade link — subtle, only shown when not connected */}
       {!isConnected && !isBusy && (
         <a
           href={`https://t.me/${BOT_USERNAME}`}
@@ -323,6 +400,49 @@ function Connected({ isConnected, isBusy, status, error, onClick, onForget, subs
 
       {error && <ErrorRow text={error} />}
     </motion.div>
+  );
+}
+
+/* ─────────── Shared: power button ─────────── */
+
+function PowerCircle({ isConnected, isBusy, onClick }) {
+  return (
+    <div className="relative flex items-center justify-center my-2">
+      <AnimatePresence>
+        {isConnected && [0, 0.8, 1.6].map((d, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-44 h-44 rounded-full border border-white/[0.04]"
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: [0.85, 1.8], opacity: [0.3, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: d }}
+          />
+        ))}
+      </AnimatePresence>
+
+      <motion.button
+        onClick={onClick}
+        disabled={isBusy}
+        whileHover={!isBusy ? { scale: 1.07 } : {}}
+        whileTap={!isBusy ? { scale: 0.93 } : {}}
+        transition={spring}
+        className="relative z-10 w-36 h-36 rounded-full flex flex-col items-center justify-center gap-2.5
+          border border-white/[0.05] disabled:opacity-40 disabled:cursor-wait"
+        style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(20px)' }}
+      >
+        {isBusy ? (
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}>
+            <Loader size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/25'} />
+          </motion.div>
+        ) : (
+          <Power size={30} strokeWidth={1.2} className={isConnected ? 'text-white/55' : 'text-white/30'} />
+        )}
+        <span className="text-[9px] font-medium tracking-[0.3em] uppercase"
+          style={{ color: isConnected ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.3)' }}>
+          {isConnected ? 'Disconnect' : 'Connect'}
+        </span>
+      </motion.button>
+    </div>
   );
 }
 

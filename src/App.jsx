@@ -552,6 +552,7 @@ export default function App() {
     setMode(m);
     try { localStorage.setItem('phantom-mode', m); } catch {}
   };
+  const [country, setCountry] = useState(null);
   const timerRef = useRef(null);
   const t = i18n[lang];
 
@@ -560,6 +561,14 @@ export default function App() {
     warpManager.init();
     return unsub;
   }, []);
+
+  // Детект страны через cdn-cgi/trace — нужно для решения Free WARP vs Free VLESS.
+  useEffect(() => {
+    if (!window.pro) return;
+    window.pro.detectCountry().then((c) => setCountry(c || null)).catch(() => {});
+  }, []);
+
+  const freeUsesVless = mode === 'free' && country === 'RU';
 
   useEffect(() => {
     if (state.status === 'connected' && state.stats.connectedSince) {
@@ -641,7 +650,9 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
 
               {mode === 'pro' ? (
-                <ProMode t={t} />
+                <ProMode tier="pro" />
+              ) : freeUsesVless ? (
+                <ProMode tier="free" />
               ) : (<>
 
               <Status status={state.status} t={t} />
@@ -707,9 +718,9 @@ export default function App() {
               </>)}
             </motion.div>
 
-            {/* Bottom Stats (FREE only) */}
+            {/* Bottom Stats (WARP only) */}
             <AnimatePresence>
-              {mode === 'free' && on && (
+              {mode === 'free' && !freeUsesVless && on && (
                 <motion.div key="bottom" className="space-y-4 pb-2"
                   initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}>

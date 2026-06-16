@@ -48,15 +48,17 @@ contextBridge.exposeInMainWorld('vpn', {
   onStatusUpdate:  (cb) => ipcRenderer.on('warp-status-update', (_, d) => cb(d)),
 });
 
-// PRO mode (sing-box / VLESS канал)
+// VLESS engine (используется и Free-в-РФ, и Pro)
 contextBridge.exposeInMainWorld('pro', {
   status:            () => ipcRenderer.invoke('pro-status'),
-  connect:           (vlessUrl) => ipcRenderer.invoke('pro-connect', vlessUrl),
+  connect:           (payload) => ipcRenderer.invoke('pro-connect', payload),
   disconnect:        () => ipcRenderer.invoke('pro-disconnect'),
   setSubscription:   (url) => ipcRenderer.invoke('pro-set-subscription', url),
   getSubscription:   () => ipcRenderer.invoke('pro-get-subscription'),
   forgetSubscription:() => ipcRenderer.invoke('pro-forget-subscription'),
   downloadBinary:    () => ipcRenderer.invoke('pro-download-binary'),
+  detectCountry:     () => ipcRenderer.invoke('pro-detect-country'),
+  ensureFree:        () => ipcRenderer.invoke('pro-ensure-free'),
   onLog:             (cb) => ipcRenderer.on('pro-log', (_, d) => cb(d)),
   onStatusUpdate:    (cb) => ipcRenderer.on('pro-status-update', (_, d) => cb(d)),
 });

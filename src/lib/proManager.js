@@ -1,13 +1,16 @@
-// Phantom VPN — PRO mode frontend manager.
-// Зеркалит API warpManager, но дергает window.pro вместо window.vpn.
+// Phantom VPN — VLESS engine frontend manager (Free + Pro через один движок sing-box).
 
 class ProManager {
   constructor() {
     this.status = 'disconnected'; // 'disconnected' | 'connecting' | 'connected' | 'disconnecting' | 'no-binary'
+    this.tier = null;             // 'free' | 'pro' | null
     this.subscription = null;
+    this.hasFree = false;
+    this.freeExpiresAt = null;
     this.hasBinary = false;
     this.connectedSince = null;
     this.publicIp = '';
+    this.country = null;
     this.error = null;
     this.listeners = new Set();
     this._e = typeof window !== 'undefined' && !!window.pro;
@@ -15,14 +18,16 @@ class ProManager {
     this._downloading = false;
 
     if (this._e) {
-      window.pro.onLog(() => {}); // подписка чтоб не терять события
-      window.pro.onStatusUpdate(({ connected }) => {
+      window.pro.onLog(() => {});
+      window.pro.onStatusUpdate(({ connected, tier }) => {
         if (connected) {
           this.status = 'connected';
+          this.tier = tier ?? this.tier;
           if (!this.connectedSince) this.connectedSince = Date.now();
           this._refreshIp();
         } else {
           this.status = 'disconnected';
+          this.tier = null;
           this.connectedSince = null;
           this.publicIp = '';
         }
@@ -36,10 +41,14 @@ class ProManager {
   _n() {
     const snapshot = {
       proStatus: this.status,
+      proTier: this.tier,
       proSubscription: this.subscription,
+      proHasFree: this.hasFree,
+      proFreeExpiresAt: this.freeExpiresAt,
       proHasBinary: this.hasBinary,
       proConnectedSince: this.connectedSince,
       proPublicIp: this.publicIp,
+      proCountry: this.country,
       proError: this.error,
       proBusy: this._busy,
       proDownloading: this._downloading,
@@ -51,13 +60,29 @@ class ProManager {
     if (!this._e) return;
     const s = await window.pro.status();
     this.hasBinary = !!s.binaryAvailable;
+    this.hasFree = !!s.hasFreeSubscription;
+    this.freeExpiresAt = s.freeExpiresAt;
     this.subscription = await window.pro.getSubscription();
     this.status = s.connected ? 'connected' : (s.binaryAvailable ? 'disconnected' : 'no-binary');
+    this.tier = s.tier || null;
     if (s.connected) {
       this.connectedSince = Date.now();
       this._refreshIp();
     }
+    // фоном — детектим страну (для решения Free WARP vs Free VLESS)
+    window.pro.detectCountry().then((c) => { this.country = c; this._n(); }).catch(() => {});
     this._n();
+  }
+
+  async ensureFree() {
+    if (!this._e) return null;
+    const r = await window.pro.ensureFree();
+    if (r && !r.error) {
+      this.hasFree = true;
+      this.freeExpiresAt = r.expires_at;
+      this._n();
+    }
+    return r;
   }
 
   async setSubscription(url) {
@@ -80,17 +105,21 @@ class ProManager {
     this._n();
   }
 
-  async connect(vlessUrlOptional) {
+  async connect(arg) {
     if (!this._e || this._busy) return { success: false };
+    // arg может быть string (legacy: явный URL) или { tier, url }
+    const payload = typeof arg === 'string' ? { url: arg, tier: 'pro' } : (arg || { tier: 'pro' });
+
     this._busy = true;
     this.status = 'connecting';
     this.error = null;
     this._n();
     try {
-      const r = await window.pro.connect(vlessUrlOptional);
+      const r = await window.pro.connect(payload);
       if (r.success) {
-        if (vlessUrlOptional) this.subscription = vlessUrlOptional;
+        if (payload.url && payload.tier === 'pro') this.subscription = payload.url;
         this.status = 'connected';
+        this.tier = r.tier || payload.tier;
         this.connectedSince = Date.now();
         this._refreshIp();
       } else {
